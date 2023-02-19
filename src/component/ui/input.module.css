@@ -1,0 +1,54 @@
+.container {
+    position: relative;
+    width: var(--input-width);
+}
+.input {
+    width: var(--input-width);
+    height: 3rem;
+    font-size: 1.2rem;
+    border-radius: 5px;
+    padding-left: calc(15px + 1.5rem);
+}
+.container span {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: calc(1.5rem + 10px);
+    height: 3rem;
+}
+.container svg {
+    width: 1.5rem;
+    height: auto;
+    position: absolute;
+    top: 0;right: 0;bottom: 0;left: 0;
+    margin: auto 5px;
+}
+.label {
+    position: absolute;
+    left: calc(15px + 1.5rem);
+    top: calc(1.5rem/2);
+    font-size: 1.5rem;
+    line-height: 1.5rem;
+    transition: 0.3s;
+}
+.input:focus ~ .label, .input:not(:placeholder-shown) ~ .label {
+    background-color: white;
+    font-size: 15px;
+    top: -12px;
+    left: 24px;
+    padding: 0 5px 0 5px;
+}
+.container svg:hover, .label {
+    cursor: text;
+}
+.bottom {
+    height: 24px;
+    line-height: 12px;
+}
+.error {
+    color: var(--input-error-color);
+    border-color: var(--input-error-color);
+}
+.search {
+    display: none;
+}

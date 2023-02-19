@@ -1,0 +1,11 @@
+.container {
+    width: calc(var(--mark-size) * 5);
+    height: var(--mark-size);
+    display: flex;
+    flex-direction: row;
+    justify-content:flex-start;
+    align-items: center;
+}
+.container p {
+    font-size: calc(var(--mark-size)/2);
+}
