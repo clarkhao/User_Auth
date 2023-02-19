@@ -1,0 +1,109 @@
+{
+  "openapi": "3.0.0",
+  "info": { "title": "Next Swagger API Example", "version": "1.0" },
+  "servers": [
+    {
+      "url": "https://UserAuth.clarkhao.repl.co:443",
+      "description": "development mode url"
+    }
+  ],
+  "components": {
+    "responses": {
+      "BadRequest": {
+        "description": "400 Client side errors",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/SimpleMessage" }
+          }
+        }
+      },
+      "FailedAuth": {
+        "description": "401 Authentication information is missing or invalid",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/SimpleMessage" }
+          }
+        }
+      },
+      "InvalidPWD": {
+        "description": "403 Invalid Password",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/SimpleMessage" }
+          }
+        }
+      },
+      "NotFound": {
+        "description": "404 The user name or email not found or invalid",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/SimpleMessage" }
+          }
+        }
+      },
+      "ConflictId": {
+        "description": "409 Already used user name or email",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/SimpleMessage" }
+          }
+        }
+      },
+      "ServerMistake": {
+        "description": "500 Server Inner Mistake",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/SimpleMessage" }
+          }
+        }
+      }
+    },
+    "schemas": {
+      "SimpleMessage": {
+        "type": "object",
+        "properties": { "message": { "type": "string" } }
+      },
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer", "description": "user id" },
+          "name": { "type": "string", "description": "user name" },
+          "email": { "type": "string", "description": "user email" },
+          "photo": { "type": "string", "description": "user profile photo url" }
+        }
+      }
+    },
+    "securitySchemes": {
+      "HttpOnlyCookie": { "type": "apiKey", "in": "cookie", "name": "token" },
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      },
+      "github_oauth": {
+        "type": "oauth2",
+        "description": "github oauth",
+        "flows": {
+          "authorizationCode": {
+            "authorizationUrl": "https://github.com/login/oauth/authorize",
+            "tokenUrl": "https://github.com/login/oauth/access_token",
+            "scope": {
+              "read": "Grants read access to public information",
+              "write": "Grants write access to public information",
+              "admin": "Grants read and write access to administrative information"
+            }
+          }
+        }
+      }
+    }
+  },
+  "paths": {
+    "/api/hello": {
+      "get": {
+        "description": "say hello",
+        "responses": { "200": { "description": "name" } }
+      }
+    }
+  },
+  "tags": []
+}
