@@ -34,3 +34,11 @@ yarn-error.log*
 
 # typescript
 *.tsbuildinfo
+
+#package
+package.json
+package-lock.json
+
+#storybook
+/src/stories
+/.storybook
