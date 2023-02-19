@@ -42,3 +42,4 @@ package-lock.json
 #storybook
 /src/stories
 /.storybook
+.npmrc
