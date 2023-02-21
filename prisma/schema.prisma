@@ -9,3 +9,48 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model User {
+  id String @id @default(uuid())
+  name String
+  type UserType
+  email String
+  role Role
+  salt String? 
+  hash String?
+  createAt DateTime @default(now()) @db.Timestamptz(3)
+  lastUpdateAt DateTime @default(now()) @db.Timestamptz(3)
+  profile Json?
+  oauth Json?
+
+  auth Auth[]
+
+  @@map("user")
+}
+
+model Auth {
+  id Int @default(autoincrement())
+  user User @relation(fields: [userId], references: [id])
+  userId String
+  token String
+  type AuthType
+
+  @@id([id,userId])
+  @@map("auth")
+}
+
+enum UserType {
+  Github
+  Email
+}
+
+enum Role {
+  Pending
+  User
+  Admin
+}
+
+enum AuthType {
+  Email
+  Bearer
+}
