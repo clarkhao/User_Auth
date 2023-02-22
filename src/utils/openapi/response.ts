@@ -23,7 +23,7 @@ export const responses = {
     }
   },
   InvalidPWD: {
-    description: '403 Invalid Password',
+    description: '403 not aurhorized',
     content: {
       'application/json': {
         schema: {
