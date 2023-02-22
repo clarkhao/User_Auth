@@ -50,5 +50,11 @@ export enum UserType {
 };
 
 export type TUserType = keyof typeof UserType
-
-export type TEmailInfo = Omit<TUser, 'salt' | 'hash'>;
+/** 
+* User数据库返回类型
+*/
+export type TUserInfo = Omit<TUser, 'salt' | 'hash'>;
+/** 
+* Github API Info返回类型，name即githubInfo.name, email即githubInfo.email
+*/
+export type TGithubUser = { name: string, email: string, githubInfo: JsonValue };

@@ -1,6 +1,7 @@
 import { UserType, Role } from '../type';
 import type { JsonValue } from '../type';
 import { PGConnect } from 'src/utils';
+import type { TUserInfo } from '../type';
 
 class User {
   protected _id: string = '';
@@ -19,71 +20,92 @@ class User {
     this.db = db;
   }
 
-  setid(id: string) {
+  setId(id: string) {
     this._id = id;
   }
   get id(): string {
     return this._id;
   }
-  setname(name: string) {
+  setName(name: string) {
     this._name = name;
   }
   get name(): string {
     return this._name;
   }
-  settype(type: UserType) {
+  setType(type: UserType) {
     this._type = type;
   }
   get type(): UserType {
     return this._type;
-  },
-  setemail(email: string) {
+  }
+  setEmail(email: string) {
     this._email = email;
   }
   get email(): string {
     return this._email;
   }
-  setrole(role: Role) {
+  setRole(role: Role) {
     this._role = role;
   }
   get role(): Role {
     return this._role;
   }
-  setsalt(salt: string) {
+  setSalt(salt: string) {
     this._salt = salt;
   }
   get salt(): string | null {
     return this._salt;
   }
-  sethash(hash: string) {
+  setHash(hash: string) {
     this._hash = hash;
   }
   get hash(): string | null {
     return this._hash;
   }
-  setcreateAt(createAt: Date) {
+  setCreateAt(createAt: Date) {
     this._createAt = createAt;
   }
   get createAt(): Date {
     return this._createAt;
   }
-  setlastUpdateAt(lastUpdateAt: Date) {
+  setLastUpdateAt(lastUpdateAt: Date) {
     this._lastUpdateAt = lastUpdateAt;
   }
   get lastUpdateAt(): Date {
     return this._lastUpdateAt;
   }
-  setprofile(profile: JsonValue) {
+  setProfile(profile: JsonValue) {
     this._profile = profile;
   }
   get profile(): JsonValue {
     return this._profile;
   }
-  setoauth(oauth: JsonValue) {
+  setOauth(oauth: JsonValue) {
     this._oauth = oauth;
   }
   get oauth(): JsonValue {
     return this._oauth;
+  }
+  /** 
+  * 读取单个用户的信息by id
+  */
+  public readUserById(id: string) {
+    this.setId(id);
+    return this.db.connect(`
+      select "id","name","type","email","role","createAt","lastUpdateAt","profile","oauth"
+      from auth.user
+      where id=$1;
+    `, { isReturning: false, isTransaction: false }, [id]) as Promise<TUserInfo | Error>;
+  }
+  /** 
+  * read User List with pagination by limit and off;
+  */
+  public readUserList(limit: number, offset: number) {
+    return this.db.connect(`
+      select "id","name","type","email","role","createAt","lastUpdateAt","profile","oauth"
+      from auth.user
+      order by "createAt" asc limit $1 offset $2;
+    `, { isReturning: false, isTransaction: false }, [limit, offset]) as Promise<TUserInfo[] | Error>;
   }
   /** 
   * 注销时删除用户信息，或者Admin批量删除用户

@@ -1,6 +1,16 @@
 {
   "server": {
-        "host": "https://UserAuth.clarkhao.repl.co",
-        "port": 443
-    }
+    "host": "https://userauth.clarkhao.repl.co",
+    "port": 443
+  },
+  "db": {
+    "host": "DB_HOST",
+    "user": "DB_ADMIN",
+    "name": "DB_NAME",
+    "pwd": "DB_PWD",
+    "port": 5432
+  },
+  "pagination": {
+    "limit": 20
+  }
 }
