@@ -20,16 +20,11 @@ class OauthUser extends User {
     this.setRole(Role.User);
     this.setOauth(oauth);
     return this.db.connect(`
-      with new_user as (
-        insert into auth.user ("name", "type", "email", "role", "oauth")
+      insert into auth.user ("name", "type", "email", "role", "oauth")
         values ($1, $2, $3, $4, $5)
         on conflict ("name", "email", "oauth")
         do update set "name"=$1, set "email"=$3, set "oauth"=$5
-        returning "id"
-      )
-      insert into auth.auth ("userId") 
-      select "id" from new_user as u
-      returning u."id";
+        returning "id";
     `, { isReturning: true, isTransaction: false }, [this.name, this.type, this.email, this.role, this.oauth]) as Promise<{ id: string } | Error>;
   }
   /** 
@@ -50,3 +45,5 @@ class OauthUser extends User {
     `, { isReturning: true, isTransaction: false }, [this.id, this.profile, new Date(Date.now()).toISOString()]) as Promise<TUserInfo | Error>;
   }
 }
+
+export { OauthUser };

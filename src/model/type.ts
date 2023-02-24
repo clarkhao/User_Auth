@@ -24,31 +24,31 @@ export type TAuth = {
   id: number
   userId: string
   token: string
-  type: AuthType
+  createAt: Date
+}
+/**
+ * Model Session
+ */
+export type TSession = {
+  id: string
+  userId: string
+  createAt: Date
+  session: JsonValue
 }
 /**
  * Enums
  */
-export enum AuthType {
-  Email = 'Email',
-  Bearer = 'Bearer'
-};
-
-export type TAuthType = keyof typeof AuthType
-
 export enum Role {
   Pending = 'Pending',
   User = 'User',
   Admin = 'Admin'
 };
-
 export type TRole = keyof typeof Role
 
 export enum UserType {
   Github = 'Github',
   Email = 'Email'
 };
-
 export type TUserType = keyof typeof UserType
 /** 
 * User数据库返回类型
