@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 /**
 * @swagger
-* /api/signup:
+* /api/auth/signup:
 *   post:
 *     description: sign up a new email user. if success, craete user with pending role in db and send a email confirmation with token inside url
 *     requestBody:
@@ -16,7 +16,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 *         content:
 *           application/json:
 *             schema:
-*               $ref:
+*               $ref: '#/components/schemas/SimpleMessage'
 *               example:
 *       400: 
 *         $ref: '#/components/responses/BadRequest'
@@ -24,16 +24,21 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 *         $ref: '#/components/responses/ConflictId'
 *       500:
 *         $ref: '#/components/responses/ServerMistake'
-*   get:
-*     description: click the email link and get here. if success, update the role from pending to user
+*   patch:
+*     description: click the email link and get here.then validate the token inside the email link. if success, update the role from pending to user and redirect to login
 *     parameters:
 *       - in: query
 *         name: token
 *         schema: 
 *           type: string
 *     responses:
-*       204:
+*       307:
 *         description: verify the token successfully
+*         headers:
+*           location:
+*             schema:
+*               type: string
+*             description: the login url
 *       400: 
 *         $ref: '#/components/responses/BadRequest'
 *       404:

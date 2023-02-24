@@ -1,6 +1,6 @@
 import { Pool } from "pg";
-const config = require('config');
 import { debugLogger } from '../logger';
+const config = require('config');
 
 type Credentials = {
   user: string,
@@ -51,10 +51,7 @@ class PGConnect {
         options?.isTransaction && handler?.apply(object, args);
         options?.isTransaction && await client.query('COMMIT');
         if ((result.command === 'INSERT' || result.command === 'UPDATE' || result.command === 'DELETE') && !options?.isReturning) {
-          if (result.rowCount > 0)
-            return true;
-          else
-            return false;
+          return true;
         } else {
           return result.rows as T[];
         }

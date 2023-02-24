@@ -3,12 +3,19 @@
     "host": "https://userauth.clarkhao.repl.co",
     "port": 443
   },
+  "key": {
+    "access": "JWT_ACCESS_KEY",
+    "refresh": "JWT_REFRESH_KEY"
+  },
   "db": {
     "host": "DB_HOST",
     "user": "DB_ADMIN",
     "name": "DB_NAME",
     "pwd": "DB_PWD",
     "port": 5432
+  },
+  "redis": {
+    "url": "REDIS_URL"
   },
   "pagination": {
     "limit": 20

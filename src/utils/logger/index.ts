@@ -1,5 +1,5 @@
 import { createLogger, transports, format } from 'winston';
-const DailyRotateFile = require('winston-daily-rotate-file');
+import DailyRotateFile from 'winston-daily-rotate-file';
 import path from 'path';
 
 // Create logger instance
@@ -8,7 +8,7 @@ const logger = createLogger({
     // write log into file with rotating 7 days
     new DailyRotateFile({
       level: 'info',
-      filename: path.join(__dirname, '../../logger/request-%DATE%.log'),
+      filename: path.join(__dirname, 'logger/request-%DATE%.log'),
       datePattern: 'YYYY-WW',
       zippedArchive: true,
       maxSize: '10m',
@@ -22,7 +22,7 @@ const logger = createLogger({
     }),
     new DailyRotateFile({
       level: 'error',
-      filename: path.join(__dirname, '../../logger/error-%DATE%.log'),
+      filename: path.join(__dirname, 'logger/error-%DATE%.log'),
       datePattern: 'YYYY-WW',
       zippedArchive: true,
       maxSize: '10m',

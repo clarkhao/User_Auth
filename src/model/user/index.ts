@@ -11,8 +11,6 @@ class User {
   protected _role: Role = Role.Pending;
   protected _salt: string | null = null;
   protected _hash: string | null = null;
-  protected _createAt: Date = new Date();
-  protected _lastUpdateAt: Date = new Date();
   protected _profile: JsonValue = null;
   protected _oauth: JsonValue = null;
   protected db: PGConnect;
@@ -61,18 +59,6 @@ class User {
   }
   get hash(): string | null {
     return this._hash;
-  }
-  setCreateAt(createAt: Date) {
-    this._createAt = createAt;
-  }
-  get createAt(): Date {
-    return this._createAt;
-  }
-  setLastUpdateAt(lastUpdateAt: Date) {
-    this._lastUpdateAt = lastUpdateAt;
-  }
-  get lastUpdateAt(): Date {
-    return this._lastUpdateAt;
   }
   setProfile(profile: JsonValue) {
     this._profile = profile;
@@ -128,3 +114,5 @@ class User {
 }
 
 export { User };
+export { EmailUser } from './email';
+export { OauthUser } from './oauth';
