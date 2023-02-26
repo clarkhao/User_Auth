@@ -3,29 +3,33 @@ import type { TUserInfo } from '../type';
 import { User } from './index';
 import { PGConnect } from 'src/utils';
 import { EmailUser } from './email';
+import { v4 as uuidv4 } from 'uuid';
 
 class OauthUser extends User {
-  private emailUser: EmailUser | undefined;
   public constructor(db: PGConnect, emailUser?: EmailUser) {
     super(db);
-    this.emailUser = emailUser;
   }
   /** 
   * 返回github用户信息后生成, 此时oauth用户的role已经不是pending，而是user
   */
   public createUser(name: string, email: string, oauth: JsonValue) {
+    this.setId(uuidv4());
     this.setName(name);
     this.setType(UserType.Github);
     this.setEmail(email);
     this.setRole(Role.User);
     this.setOauth(oauth);
     return this.db.connect(`
-      insert into auth.user ("name", "type", "email", "role", "oauth")
-        values ($1, $2, $3, $4, $5)
+      insert into auth.user ("id", "name", "type", "email", "role", "oauth")
+        values ($1, $2, $3, $4, $5, $6)
         on conflict ("name", "email", "oauth")
-        do update set "name"=$1, set "email"=$3, set "oauth"=$5
+        do update set "name"=$2, set "email"=$4, set "oauth"=$6
         returning "id";
-    `, { isReturning: true, isTransaction: false }, [this.name, this.type, this.email, this.role, this.oauth]) as Promise<{ id: string } | Error>;
+    `, { isReturning: true, isTransaction: false }, [this.id, this.name, this.type, this.email, this.role, this.oauth]) as Promise<{
+      success: boolean;
+      query: { id: string }[];
+      error: Error | null;
+    }>;
   }
   /** 
   * github用户可以通过添加email和hash新建一个email账户
@@ -42,7 +46,11 @@ class OauthUser extends User {
       set "profile"=$2 "lastUpdateAt"=$3
       where "id"=$1
       returning "id","name","type","email","role","createAt","lastUpdateAt","profile","oauth"; 
-    `, { isReturning: true, isTransaction: false }, [this.id, this.profile, new Date(Date.now()).toISOString()]) as Promise<TUserInfo | Error>;
+    `, { isReturning: true, isTransaction: false }, [this.id, this.profile, new Date(Date.now()).toISOString()]) as Promise<{
+      success: boolean;
+      query: TUserInfo[];
+      error: Error | null;
+    }>;
   }
 }
 

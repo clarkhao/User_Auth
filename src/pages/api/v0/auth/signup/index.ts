@@ -1,7 +1,12 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
+import { LoggerMiddleware } from 'src/middleware/logger';
+import { SignatureMiddleware } from 'src/middleware/verifySign';
+import { ErrorMiddleware } from 'src/middleware/error';
+import { verifySignupData, isSignupRepeated, createUser, sendEmailWithToken } from 'src/service';
+import { debugLogger } from 'src/utils';
 /**
 * @swagger
-* /api/auth/signup:
+* /api/v0/auth/signup:
 *   post:
 *     description: sign up a new email user. if success, craete user with pending role in db and send a email confirmation with token inside url
 *     requestBody:
@@ -49,7 +54,39 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 */
 
 async function SignUpHandler(req: NextApiRequest, res: NextApiResponse) {
+  try {
+    switch (req.method) {
+      case 'post':
+        LoggerMiddleware(req, res);
+        //decrypt req.body and verify signature
+        const { data, error } = SignatureMiddleware(req);
+        if (error !== null) {
+          throw error;
+        }
+        //verify the input signup data, and duplicate signup info check
+        const signupData = verifySignupData(data);
+        await isSignupRepeated(signupData);
+        //save signup info into db
+        const { id } = await createUser(signupData);
+        //send email for confirmation
+        await sendEmailWithToken(id, signupData.email);
+        //response
+        //add headers or cookie in middleware
+        //add status code and json here
+        res.status(201).json({ id });
+        break;
+      case 'patch':
+        //validate the email token
+        //update the user
+        break;
+      default:
+        res.status(405).send('Method not allowed');
+        break;
+    }
 
+  } catch (err) {
+    ErrorMiddleware(err, res);
+  }
 }
 
 export default SignUpHandler;
