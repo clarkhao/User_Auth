@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 /**
 * @swagger
-* /api/auth/login:
+* /api/v0/auth/login:
 *   post:
 *     description: email user try to login with email and pwd. if Match it will send 2 tokens, one is access token, another as refresh token inside a httponly cookie. then create session record in redis and backup in db.
 *     requestBody:

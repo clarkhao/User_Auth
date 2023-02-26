@@ -115,7 +115,28 @@
     }
   },
   "paths": {
-    "/api/signup": {
+    "/api/hello": {
+      "get": {
+        "description": "say hello",
+        "responses": { "200": { "description": "name" } }
+      }
+    },
+    "/api/v0/auth": {},
+    "/api/v0/auth/oauth/github": {
+      "get": {
+        "description": "authentication with oauth github",
+        "paremeters": [
+          {
+            "in": "query",
+            "name": "code",
+            "schema": { "type": "string" },
+            "description": "The code sent by Github which will be used for token fetch"
+          }
+        ],
+        "responses": { "201": null, "500": null, "502": null }
+      }
+    },
+    "/api/v0/auth/signup": {
       "post": {
         "description": "sign up a new email user. if success, craete user with pending role in db and send a email confirmation with token inside url",
         "requestBody": {
@@ -131,7 +152,10 @@
             "description": "craete user with pending role in db and send a email confirmation with token inside url",
             "content": {
               "application/json": {
-                "schema": { "$ref": null, "example": null }
+                "schema": {
+                  "$ref": "#/components/schemas/SimpleMessage",
+                  "example": null
+                }
               }
             }
           },
@@ -140,23 +164,25 @@
           "500": { "$ref": "#/components/responses/ServerMistake" }
         }
       },
-      "get": {
-        "description": "click the email link and get here. if success, update the role from pending to user",
+      "patch": {
+        "description": "click the email link and get here.then validate the token inside the email link. if success, update the role from pending to user and redirect to login",
         "parameters": [
           { "in": "query", "name": "token", "schema": { "type": "string" } }
         ],
         "responses": {
-          "204": { "description": "verify the token successfully" },
+          "307": {
+            "description": "verify the token successfully",
+            "headers": {
+              "location": {
+                "schema": { "type": "string" },
+                "description": "the login url"
+              }
+            }
+          },
           "400": { "$ref": "#/components/responses/BadRequest" },
           "404": { "$ref": "#/components/responses/NotFound" },
           "500": { "$ref": "#/components/responses/ServerMistake" }
         }
-      }
-    },
-    "/api/hello": {
-      "get": {
-        "description": "say hello",
-        "responses": { "200": { "description": "name" } }
       }
     }
   },

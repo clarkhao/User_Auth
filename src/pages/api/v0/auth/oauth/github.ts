@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 /**
 * @swagger
-* /api/auth/oauth/github:
+* /api/v0/auth/oauth/github:
 *   get:
 *     description: authentication with oauth github
 *     paremeters:

@@ -13,7 +13,7 @@ export function Left() {
 
     }
     const handleFocus: React.FocusEventHandler = (e) => {
-
+2
     }
     const handleEnterClick = (e: React.KeyboardEvent<HTMLInputElement>) => {        
         if(e.key == 'Enter') {

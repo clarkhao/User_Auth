@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 /**
 * @swagger
-* /api/auth:
-*     
+* /api/v0/auth:
+*
 */

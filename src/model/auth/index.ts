@@ -1,5 +1,5 @@
 const config = require('config');
-import { generateToken, validateToken } from 'src/utils';
+import { generateToken, verifyToken } from 'src/utils';
 import { PGConnect } from 'src/utils';
 import type { TAuth } from '../type';
 
@@ -26,7 +26,11 @@ class Auth {
       insert into auth.auth ("userId", "token")
       values ($1, $2)
       returning *;
-    `, { isReturning: true, isTransaction: false }, [this.userId, this.token]) as Promise<TAuth[] | Error>
+    `, { isReturning: true, isTransaction: false }, [this.userId, this.token]) as Promise<{
+      success: boolean;
+      query: TAuth[];
+      error: Error | null;
+    }>;
   }
   /** 
   * read by token to be cheked whether repeated
@@ -38,8 +42,12 @@ class Auth {
       when (select count(*) from auth.auth where token=$1) > 0
       then true
       else false
-    end as isTokenExisted;
-    `, { isReturning: false, isTransaction: false }, [this.token]) as Promise<Error | { isTokenExisted: boolean }[]>;
+    end as token;
+    `, { isReturning: false, isTransaction: false }, [this.token]) as Promise<{
+      success: boolean;
+      query: { token: boolean }[];
+      error: Error | null;
+    }>;
   }
 }
 

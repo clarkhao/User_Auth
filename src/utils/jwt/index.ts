@@ -16,17 +16,20 @@ const generateToken = (id: string, secret: string, duration: string) => {
   }
 }
 /** 
-* @params token to be validated
+* @params token to be verified
 * @params secret key.access或者key.refresh
 * @returns true if ok otherwise throw error
 */
-const validateToken = (token: string, secret: string) => {
+const verifyToken = (token: string, secret: string) => {
   try {
-    jwt.verify(token, secret);
-    return true;
+    const payload = jwt.verify(token, secret);
+    return payload;
   } catch (err) {
-    throw new Error(`${err}`);
+    if (err instanceof Error) {
+      return err;
+    } else
+      return new Error(`${err}`);
   }
 }
 
-export { generateToken, validateToken }
+export { generateToken, verifyToken }

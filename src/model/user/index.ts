@@ -17,7 +17,6 @@ class User {
   public constructor(db: PGConnect) {
     this.db = db;
   }
-
   setId(id: string) {
     this._id = id;
   }
@@ -81,7 +80,11 @@ class User {
       select "id","name","type","email","role","createAt","lastUpdateAt","profile","oauth"
       from auth.user
       where id=$1;
-    `, { isReturning: false, isTransaction: false }, [id]) as Promise<TUserInfo | Error>;
+    `, { isReturning: false, isTransaction: false }, [id]) as Promise<{
+      success: boolean;
+      query: TUserInfo[];
+      error: Error | null;
+    }>;
   }
   /** 
   * read User List with pagination by limit and off;
@@ -91,7 +94,11 @@ class User {
       select "id","name","type","email","role","createAt","lastUpdateAt","profile","oauth"
       from auth.user
       order by "createAt" asc limit $1 offset $2;
-    `, { isReturning: false, isTransaction: false }, [limit, offset]) as Promise<TUserInfo[] | Error>;
+    `, { isReturning: false, isTransaction: false }, [limit, offset]) as Promise<{
+      success: boolean;
+      query: TUserInfo[];
+      error: Error | null;
+    }>;
   }
   /** 
   * 注销时删除用户信息，或者Admin批量删除用户
@@ -109,10 +116,12 @@ class User {
       where u.id=any(
         select "userId" from delete_auth
       );
-    `, { isReturning: false, isTransaction: false }, [ids]) as Promise<boolean | Error>;
+    `, { isReturning: false, isTransaction: false }, [ids]) as Promise<{
+      success: boolean;
+      query: null;
+      error: Error | null;
+    }>;
   }
 }
 
 export { User };
-export { EmailUser } from './email';
-export { OauthUser } from './oauth';

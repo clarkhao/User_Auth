@@ -41,7 +41,7 @@ class PGConnect {
    *                options.isTransaction
    * @param handler optional handler occured in a transaction situation, not async function
    * @param args the arguments binded with handler
-   * @returns Promise<boolean | T[] | Error>
+   * @returns Promise<{success: boolean;query: null|T[];error: Error|null;}>
    */
   public connect<T>(text: string, options: ConnectOption, values?: unknown[], handler?: Function, object?: Object, args?: unknown[]) {
     return this.pool.connect().then(async client => {
@@ -51,14 +51,20 @@ class PGConnect {
         options?.isTransaction && handler?.apply(object, args);
         options?.isTransaction && await client.query('COMMIT');
         if ((result.command === 'INSERT' || result.command === 'UPDATE' || result.command === 'DELETE') && !options?.isReturning) {
-          return true;
+          return { success: true, query: null, error: null };
         } else {
-          return result.rows as T[];
+          return { success: true, query: result.rows as T[], error: null };
         }
       } catch (err) {
         options?.isTransaction && await client.query('ROLLBACK');
         debugLogger.debug(`from db utils connect: ${err}`);
-        return Error(`${err}`);
+        let errMsg = '';
+        if (err instanceof Error) {
+          errMsg = err.message;
+        } else {
+          errMsg = `${err}`
+        }
+        return { success: false, query: null, error: Error(errMsg) };
       } finally {
         client.release();
       }

@@ -3,16 +3,16 @@ import { debugLogger } from 'src/utils';
 
 const ErrorMiddleware = (err: unknown, res: NextApiResponse) => {
   try {
-    let str = '';
+    let errMsg = '';
     if (err instanceof Error) {
-      str = err.message;
+      errMsg = err.message;
     } else {
-      str = `${err}`;
+      errMsg = `${err}`;
     }
-    const [numStr, ...messageArray] = str.split(' ') as string[];
+    const [numStr, ...messageArray] = errMsg.split(' ') as string[];
     const num = parseInt(numStr);
     const statusCode = Number.isNaN(num) ? 500 : num;
-    const message = Number.isNaN(num) ? str : messageArray.join(' ');
+    const message = Number.isNaN(num) ? errMsg : messageArray.join(' ');
     if (statusCode > 499) {
       debugLogger.debug(message);
       res.status(statusCode).json({ msg: 'inner server mistake' });
