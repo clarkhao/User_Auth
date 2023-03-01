@@ -1,6 +1,6 @@
 /**
  * secret取自req.secret密语，sign取自req.sign,签名，data取自req.data是加密后的前端数据
- * 
+ * 非对称解密
  */
 import crypto from 'crypto';
 const config = require('config');
@@ -50,12 +50,13 @@ class Cryption {
   }
   /**
    * 解密req.data，并使用密语secret对其进行生成签名sign, 然后比对req.sign，验证签名
+   * 加签过程使用Hash Hmac
    */
   public isSignValid() {
     const decrypted = this.decryptData(this.data, this.dataKey);
     this.decrypted = decrypted;
     const crypted = require("crypto")
-      .createHmac("md5", this.decryptedSecret)
+      .createHmac("sha256", this.decryptedSecret)
       .update(decrypted)
       .digest("hex");
     return crypted === this.sign;

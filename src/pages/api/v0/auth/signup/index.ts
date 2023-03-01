@@ -2,7 +2,15 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { LoggerMiddleware } from 'src/middleware/logger';
 import { SignatureMiddleware } from 'src/middleware/verifySign';
 import { ErrorMiddleware } from 'src/middleware/error';
-import { verifySignupData, isSignupRepeated, createUser, sendEmailWithToken } from 'src/service';
+import {
+  verifySignupData,
+  isSignupRepeated,
+  createUser,
+  generateSignupToken,
+  sendEmailWithToken,
+
+  verifySignupToken
+} from 'src/service';
 import { debugLogger } from 'src/utils';
 /**
 * @swagger
@@ -29,7 +37,7 @@ import { debugLogger } from 'src/utils';
 *         $ref: '#/components/responses/ConflictId'
 *       500:
 *         $ref: '#/components/responses/ServerMistake'
-*   patch:
+*   get:
 *     description: click the email link and get here.then validate the token inside the email link. if success, update the role from pending to user and redirect to login
 *     parameters:
 *       - in: query
@@ -56,7 +64,7 @@ import { debugLogger } from 'src/utils';
 async function SignUpHandler(req: NextApiRequest, res: NextApiResponse) {
   try {
     switch (req.method) {
-      case 'post':
+      case 'POST':
         LoggerMiddleware(req, res);
         //decrypt req.body and verify signature
         const { data, error } = SignatureMiddleware(req);
@@ -67,23 +75,30 @@ async function SignUpHandler(req: NextApiRequest, res: NextApiResponse) {
         const signupData = verifySignupData(data);
         await isSignupRepeated(signupData);
         //save signup info into db
-        const { id } = await createUser(signupData);
-        //send email for confirmation
-        await sendEmailWithToken(id, signupData.email);
+        //const { id } = await createUser(signupData);
+        //generate the code inside email url
+        generateSignupToken('1')
+          .then(token => {
+            //send email for confirmation
+            sendEmailWithToken(token, signupData.email);
+          })
         //response
         //add headers or cookie in middleware
         //add status code and json here
-        res.status(201).json({ id });
+        res.status(201).json({ msg: 'ok' });
         break;
-      case 'patch':
-        //validate the email token
+      case 'GET':
+        const code = req.query['code'];
+        const verifiedData = verifySignupToken(code);
+        //确认是否pending
+        //validate the email token，如失效，重发连接
         //update the user
+        res.status(200).json({ msg: 'OK' });
         break;
       default:
         res.status(405).send('Method not allowed');
         break;
     }
-
   } catch (err) {
     ErrorMiddleware(err, res);
   }

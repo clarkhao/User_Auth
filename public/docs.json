@@ -164,7 +164,7 @@
           "500": { "$ref": "#/components/responses/ServerMistake" }
         }
       },
-      "patch": {
+      "get": {
         "description": "click the email link and get here.then validate the token inside the email link. if success, update the role from pending to user and redirect to login",
         "parameters": [
           { "in": "query", "name": "token", "schema": { "type": "string" } }

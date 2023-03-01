@@ -34,6 +34,20 @@ const logger = createLogger({
         })
       )
     }),
+    new DailyRotateFile({
+      level: 'warn',
+      filename: 'logger/warn-%DATE%.log',
+      datePattern: 'YYYY-WW',
+      zippedArchive: true,
+      maxSize: '10m',
+      maxFiles: '7d',
+      format: format.combine(
+        format.timestamp(),
+        format.printf(info => {
+          return `${info.timestamp} [${info.level}]: ${JSON.stringify(info.message)}`;
+        })
+      )
+    })
   ]
 });
 

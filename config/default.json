@@ -6,7 +6,8 @@
   "key": {
     "access": "JWT_ACCESS_KEY",
     "refresh": "JWT_REFRESH_KEY",
-    "email": "JWT_EMAIL_KEY"
+    "email": "JWT_EMAIL_KEY",
+    "cipher": "C_KEY"
   },
   "db": {
     "host": "DB_HOST",
@@ -19,15 +20,15 @@
     "url": "REDIS_URL"
   },
   "frontend": {
-        "home_page": "HOME_PAGE",
-        "word": "WORD"
-    },
+    "home_page": "HOME_PAGE",
+    "word": "WORD"
+  },
   "pagination": {
     "limit": 20
   },
   "mailer": {
-        "port": "MAIL_PORT",
-        "auth_user": "MAIL_USER",
-        "auth_pwd": "MAIL_PWD"
-    }
+    "port": "MAIL_PORT",
+    "auth_user": "MAIL_USER",
+    "auth_pwd": "MAIL_PWD"
+  }
 }
