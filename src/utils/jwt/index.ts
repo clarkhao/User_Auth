@@ -18,7 +18,7 @@ const generateToken = (id: string, secret: string, duration: string) => {
 /** 
 * @params token to be verified
 * @params secret key.access或者key.refresh
-* @returns true if ok otherwise throw error
+* @returns payload if ok otherwise return error
 */
 const verifyToken = (token: string, secret: string) => {
   try {

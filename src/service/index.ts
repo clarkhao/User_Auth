@@ -2,5 +2,8 @@ export {
   verifySignupData,
   isSignupRepeated,
   createUser,
-  sendEmailWithToken
+  generateSignupToken,
+  sendEmailWithToken,
+
+  verifySignupToken
 } from './auth';
