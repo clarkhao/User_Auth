@@ -5,8 +5,8 @@ import { logger } from '../logger';
 import * as crypto from 'crypto';
 /** 
 * encrypt data with cipher aes-256-cbc
-* @params data: to be encrypted
-* @params secret: correspond to algorithm
+* @param data: to be encrypted
+* @param secret: correspond to algorithm
 * @returns encrypted result string
 */
 function encrypt(data: string, secret: string) {
@@ -37,7 +37,7 @@ function decrypt(data: string, secret: string) {
 
 }
 
-nction encodeUrlSafe(data: string): string {
+function encodeUrlSafe(data: string): string {
   return Buffer.from(data).toString('base64url');
 }
 
