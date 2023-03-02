@@ -95,8 +95,8 @@ async function SignUpHandler(req: NextApiRequest, res: NextApiResponse) {
         const code = req.query["code"];
         if (typeof code !== "string") throw new Error(`400 invalid url`);
         //validate the email token，如失效，重发连接
-        const { valid, userId } = verifySignupToken(code);
-        if (!valid) {
+        const { isValid, userId } = await verifySignupToken(code);
+        if (!isValid) {
           generateSignupToken(userId).then((token) => {
             if (token instanceof Error) {
               return;

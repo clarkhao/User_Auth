@@ -147,9 +147,9 @@ const verifySignupToken = async (code: string) => {
     })) as string;
     const dataObj = JSON.parse(jsonData) as SignupData;
     if (dataObj.expiryTime < Math.floor(Date.now() / 1000)) {
-      return { valid: false, userId: dataObj.userId };
+      return { isValid: false, userId: dataObj.userId };
     }
-    return { valid: true, userId: dataObj.userId };
+    return { isValid: true, userId: dataObj.userId };
   } catch (error) {
     logger.warn({
       err: `${error}`,
