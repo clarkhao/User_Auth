@@ -28,7 +28,7 @@ function decrypt(data: string, secret: string) {
     const [ivHex, encryptedHex] = data.split(':');
     const iv = Buffer.from(ivHex, 'hex');
     const encrypted = Buffer.from(encryptedHex, 'hex');
-    const decipher = crypto.createDecipheriv('aes-256-cbc', secret, iv);
+    const decipher = crypto.createDecipheriv('aes-256-ctr', secret, iv);
     return Buffer.concat([decipher.update(encrypted), decipher.final()]).toString();
   } catch (error) {
     logger.warn({ error, location: 'from utils/cryption/cypoher/decrypt' });
