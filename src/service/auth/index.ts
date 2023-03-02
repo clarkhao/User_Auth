@@ -89,7 +89,7 @@ const generateSignupToken = async (userId: string) => {
       const expiryTime = Math.floor(Date.now() / 1000) + EXPIRY_DURATION;
       const data: SignupData = { userId, expiryTime };
       const jsonData = JSON.stringify(data);
-      const encryptedData = (await doHeavyWork("/job.ts", "encrypt", {
+      const encryptedData = (await doHeavyWork("/job.js", "encrypt", {
         data: jsonData,
         secret: SECRET_KEY,
       })) as string;
