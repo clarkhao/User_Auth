@@ -5,5 +5,6 @@ export {
   generateSignupToken,
   sendEmailWithToken,
 
-  verifySignupToken
+  verifySignupToken,
+  checkUserRole
 } from './auth';
