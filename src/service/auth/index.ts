@@ -10,6 +10,7 @@ import {
   verifyToken,
   encrypt,
   decrypt,
+  doHeavyWork,
 } from "src/utils";
 import type { MailResponse } from "src/utils";
 import { ZodError } from "zod";
@@ -84,11 +85,14 @@ const createUser = async (signup: SignUp) => {
 const generateSignupToken = async (userId: string) => {
   // promise化
   return Promise.resolve()
-    .then(() => {
+    .then(async () => {
       const expiryTime = Math.floor(Date.now() / 1000) + EXPIRY_DURATION;
       const data: SignupData = { userId, expiryTime };
       const jsonData = JSON.stringify(data);
-      const encryptedData = encrypt(jsonData, SECRET_KEY);
+      const encryptedData = (await doHeavyWork("/job.ts", "encrypt", {
+        data: jsonData,
+        secret: SECRET_KEY,
+      })) as string;
       return Buffer.from(encryptedData).toString("base64url");
     })
     .catch((error) => {
@@ -134,10 +138,13 @@ const sendEmailWithToken = async (token: string, email: string) => {
  * @param code: url query string
  * @returns userId as string
  */
-const verifySignupToken = (code: string) => {
+const verifySignupToken = async (code: string) => {
   try {
     const decodedData = Buffer.from(code, "base64url").toString();
-    const jsonData = decrypt(decodedData, SECRET_KEY);
+    const jsonData = (await doHeavyWork("/job.js", "decrypt", {
+      data: decodedData,
+      secret: SECRET_KEY,
+    })) as string;
     const dataObj = JSON.parse(jsonData) as SignupData;
     if (dataObj.expiryTime < Math.floor(Date.now() / 1000)) {
       return { valid: false, userId: dataObj.userId };
@@ -180,5 +187,5 @@ export {
   generateSignupToken,
   sendEmailWithToken,
   verifySignupToken,
-  checkUserRole
+  checkUserRole,
 };
