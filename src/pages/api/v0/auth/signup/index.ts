@@ -80,6 +80,7 @@ async function SignUpHandler(req: NextApiRequest, res: NextApiResponse) {
         //generate the code inside email url
         generateSignupToken(id).then((token) => {
           if (token instanceof Error) {
+            logger.warn({err: token, location: 'from service/generateSignupToken'})
             return;
           } else {
             //send email for confirmation
