@@ -11,3 +11,4 @@ export {encrypt,decrypt} from './cryption/cypher';
 export { verify, SignupSchema } from './validate';
 export { Mailer } from './mail';
 export type { MailResponse } from './mail';
+export {doHeavyWork} from './worker';
