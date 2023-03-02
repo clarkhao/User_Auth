@@ -17,6 +17,7 @@ import { ZodError } from "zod";
 import Mail from "nodemailer/lib/mailer";
 import { Role } from "src/model/type";
 const config = require("config");
+import path from 'path';
 
 const SECRET_KEY = process.env[config.get("key.cipher")] || "";
 const EXPIRY_DURATION = 3600; // Expiry duration in seconds (1 hour)
@@ -89,10 +90,7 @@ const generateSignupToken = async (userId: string) => {
       const expiryTime = Math.floor(Date.now() / 1000) + EXPIRY_DURATION;
       const data: SignupData = { userId, expiryTime };
       const jsonData = JSON.stringify(data);
-      const encryptedData = (await doHeavyWork("/job.js", "encrypt", {
-        data: jsonData,
-        secret: SECRET_KEY,
-      })) as string;
+      const encryptedData = encrypt(jsonData, SECRET_KEY)
       return Buffer.from(encryptedData).toString("base64url");
     })
     .catch((error) => {
@@ -141,10 +139,7 @@ const sendEmailWithToken = async (token: string, email: string) => {
 const verifySignupToken = async (code: string) => {
   try {
     const decodedData = Buffer.from(code, "base64url").toString();
-    const jsonData = (await doHeavyWork("/job.js", "decrypt", {
-      data: decodedData,
-      secret: SECRET_KEY,
-    })) as string;
+    const jsonData = decrypt(decodedData, SECRET_KEY);
     const dataObj = JSON.parse(jsonData) as SignupData;
     if (dataObj.expiryTime < Math.floor(Date.now() / 1000)) {
       return { isValid: false, userId: dataObj.userId };
