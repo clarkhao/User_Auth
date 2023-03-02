@@ -23,9 +23,8 @@ function encrypt(data: string, secret: string) {
 /** 
 *
 */
-function decrypt(code: string, secret: string) {
+function decrypt(data: string, secret: string) {
   try {
-    const data = decodeUrlSafe(code);
     const [ivHex, encryptedHex] = data.split(':');
     const iv = Buffer.from(ivHex, 'hex');
     const encrypted = Buffer.from(encryptedHex, 'hex');

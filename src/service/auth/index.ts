@@ -104,12 +104,11 @@ const generateSignupToken = async (userId: string) => {
  * @param email: email in signup data
  */
 const sendEmailWithToken = async (token: string, email: string) => {
-  const encodedToken = Buffer.from(token).toString("base64url");
   const mailer = new Mailer();
   const url = config
     .get("server.host")
     ?.concat(`:${config.get("server.port")}`)
-    .concat(`/api/v0/auth/signup?code=${encodedToken}`);
+    .concat(`/api/v0/auth/signup?code=${token}`);
   mailer
     .sendMail(
       email,
