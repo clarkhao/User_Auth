@@ -104,7 +104,7 @@ async function SignUpHandler(req: NextApiRequest, res: NextApiResponse) {
               sendEmailWithToken(token, signupData.email);
             }
           });
-          res.status(301);
+          res.status(301).end();
         }
         //确认是否pending, if pending turn pending into user,
         //otherwise check authentication, if already in, do nothing just send status 200,
@@ -116,7 +116,7 @@ async function SignUpHandler(req: NextApiRequest, res: NextApiResponse) {
             "location",
             `${config.get("server.host").concat("/auth/login")}`
           );
-          res.status(307);
+          res.status(307).end();
         } else {
           logger.warn({err: 'failed to update role from pending to user'});
           throw new Error(`500 inner server mistake`);
