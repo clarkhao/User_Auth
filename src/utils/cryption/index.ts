@@ -1,66 +1,54 @@
 /**
- * secret取自req.secret密语，sign取自req.sign,签名，data取自req.data是加密后的前端数据
- * 非对称解密
+ * req.body.data = 'data(base64):key'
+ * 非对称解密key后再AES解密data, data格式为{email,name,password}
  */
 import crypto from 'crypto';
 const config = require('config');
+import { debugLogger } from '../index';
 
 class Cryption {
-  private secret: string;
-  private sign: string;
+  private raw: string;
+  private keyNIV: string;
   private data: string;
-  private decryptedSecret: string;
   decrypted: string = '';
-  private ending: string;
-  private secretKey = crypto.createPrivateKey({
-    key: Buffer.from(process.env.SECRET_KEY || '', 'base64'),
-    format: "der",
-    type: 'pkcs1',
-  });
-  private dataKey = crypto.createPrivateKey({
-    key: Buffer.from(process.env.DATA_KEY || '', 'base64'),
-    format: "der",
-    type: 'pkcs1',
-  });
-  constructor(secret: string, sign: string, data: string) {
-    this.secret = secret;
-    this.sign = sign;
-    this.data = data;
-    this.decryptedSecret = '';
-    this.ending = process.env[config.get('frontend.word')] || '';
+  constructor(raw: string) {
+    this.raw = raw;
+    [this.data, this.keyNIV] = raw.split(":");
   }
-  private decryptData(encrypted: string, key: crypto.KeyObject) {
-    const rsaPrivateKey = {
-      key: key,
-      //passphrase: '',
-      padding: crypto.constants.RSA_PKCS1_OAEP_PADDING,
-    };
-    const decryptedData = crypto.privateDecrypt(
-      rsaPrivateKey,
-      Buffer.from(encrypted, 'base64'),
-    );
-    return decryptedData.toString();
+  public decryptData() {
+    //decrypted the key with private-key
+    const encryptedKeyNIv = Buffer.from(this.keyNIV, "base64");
+    try {
+      // Decrypt the encrypted key using the RSA private key
+      const savedKey = process.env.SECRET_KEY as string;
+      const privateKey = Buffer.from(savedKey, 'base64');
+      const decryptedKeyNIv = crypto
+        .privateDecrypt(
+          {
+            key: privateKey,
+            padding: crypto.constants.RSA_PKCS1_PADDING,
+          },
+          encryptedKeyNIv
+        )
+        .toString();
+      console.log(`key: ${decryptedKeyNIv}`);
+      const [keyStr, ivStr] = decryptedKeyNIv.split(":");
+      const encrypted = Buffer.from(this.data, "base64");
+      const key = Buffer.from(keyStr, "base64");
+      const iv = Buffer.from(ivStr, "base64");
+      //非对称解密
+      const decipher = crypto.createDecipheriv("aes-128-cbc", key, iv);
+      let decrypted = decipher.update(encrypted);
+      decrypted = Buffer.concat([decrypted, decipher.final()]);
+      const decryptedString = decrypted.toString();
+      console.log(decryptedString)
+      return decryptedString;
+    } catch (error) {
+      console.log(`${error}`);
+      throw error;
+    }
   }
-  /**
-   * 解密req.secret，并验证其是否是密语
-   */
-  public isSecret() {
-    this.decryptedSecret = this.decryptData(this.secret, this.secretKey);
-    return this.decryptedSecret.endsWith(this.ending);
-  }
-  /**
-   * 解密req.data，并使用密语secret对其进行生成签名sign, 然后比对req.sign，验证签名
-   * 加签过程使用Hash Hmac
-   */
-  public isSignValid() {
-    const decrypted = this.decryptData(this.data, this.dataKey);
-    this.decrypted = decrypted;
-    const crypted = require("crypto")
-      .createHmac("sha256", this.decryptedSecret)
-      .update(decrypted)
-      .digest("hex");
-    return crypted === this.sign;
-  }
+
 }
 
 export { Cryption };

@@ -8,3 +8,5 @@ export {
   verifySignupToken,
   checkUserRole
 } from './auth';
+
+export {getCodeFromGithub, getTokenFromGithub, getUserInfoWithToken, createGithubUser } from './oauth/github';

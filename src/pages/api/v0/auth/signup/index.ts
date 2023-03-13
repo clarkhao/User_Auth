@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { LoggerMiddleware } from "src/middleware/logger";
-import { SignatureMiddleware } from "src/middleware/verifySign";
 import { ErrorMiddleware } from "src/middleware/error";
+import { DecryptMiddleware } from "src/middleware/decrypt";
 import {
   verifySignupData,
   isSignupRepeated,
@@ -68,7 +68,7 @@ async function SignUpHandler(req: NextApiRequest, res: NextApiResponse) {
       case "POST":
         LoggerMiddleware(req, res);
         //decrypt req.body and verify signature
-        const { data, error } = SignatureMiddleware(req);
+        const { data, error } = DecryptMiddleware(req);
         if (error !== null) {
           throw error;
         }
@@ -76,7 +76,7 @@ async function SignUpHandler(req: NextApiRequest, res: NextApiResponse) {
         const signupData = verifySignupData(data);
         await isSignupRepeated(signupData);
         //save signup info into db
-        const { id } = await createUser(signupData);
+        const { email, id } = await createUser(signupData);
         //generate the code inside email url
         generateSignupToken(id).then((token) => {
           if (token instanceof Error) {
@@ -89,7 +89,7 @@ async function SignUpHandler(req: NextApiRequest, res: NextApiResponse) {
         //response
         //add headers or cookie
         //add status code and json here
-        res.status(201).json({ id });
+        res.status(201).json({ email });
         break;
       case "GET":
         const code = req.query["code"];
@@ -118,7 +118,7 @@ async function SignUpHandler(req: NextApiRequest, res: NextApiResponse) {
           );
           res.status(307).end();
         } else {
-          logger.warn({err: 'failed to update role from pending to user'});
+          logger.warn({ err: 'failed to update role from pending to user' });
           throw new Error(`500 inner server mistake`);
         }
         break;

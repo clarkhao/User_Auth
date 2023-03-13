@@ -17,11 +17,11 @@
     "port": 5432
   },
   "redis": {
-    "url": "REDIS_URL"
+    "upurl": "REDIS_UP_URL",
+    "downurl": "REDIS_DOWN_URL"
   },
   "frontend": {
-    "home_page": "HOME_PAGE",
-    "word": "WORD"
+    "home_page": "HOME_PAGE"
   },
   "pagination": {
     "limit": 20

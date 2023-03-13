@@ -3,6 +3,8 @@ export { schemas } from './openapi/schema';
 export { securitySchemas } from './openapi/securitySchema';
 
 export { db, PGConnect } from './db';
+export {redisUpClient} from './redis';
+export {redisDownClient} from './redis';
 
 export { generateToken, verifyToken } from './jwt';
 export { logger, debugLogger } from './logger';
