@@ -8,10 +8,12 @@ export function middleware(request: NextRequest) {
   * for security 除了swagger doc页面
   */
   if (!request.nextUrl.pathname.startsWith('/docs')) {
+    /* develop mode closed these headers
     response.headers.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+    response.headers.set('Content-Security-Policy', `script-src 'self'`);
+    */
     response.headers.set('X-XSS-Protection', '1; mode=block');
     response.headers.set('X-Frame-Options', 'SAMEORIGIN');
-    response.headers.set('Content-Security-Policy', `script-src 'self'`);
     response.headers.set('X-Content-Type-Options', 'nosniff');
     /** 
     * auth api不设缓存
@@ -31,6 +33,8 @@ export function middleware(request: NextRequest) {
   /** 
   * CORS
   */
+  response.headers.set('Access-control-allow-origin', 'http://192.168.3.55:3000');
+  response.headers.set('Access-control-allow-method', '*');
 
   return response;
 }

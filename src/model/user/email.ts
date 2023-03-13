@@ -25,10 +25,10 @@ class EmailUser extends User {
     return this.db.connect(`
       insert into auth.user ("id", "name", "type", "email", "role", "salt", "hash")
       values ($1, $2, $3, $4, $5, $6, $7)
-      returning "id";
+      returning "email", "id";
     `, { isReturning: true, isTransaction: false }, [this.id, this.name, this.type, this.email, this.role, this.salt, this.hash]) as Promise<{
       success: boolean;
-      query: { id: string }[];
+      query: { email: string, id: string }[];
       error: Error | null;
     }>;
   }
