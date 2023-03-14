@@ -10,33 +10,34 @@ class OauthUser extends User {
     super(db);
   }
   /** 
-  * 返回github用户信息后生成, 此时oauth用户的role已经不是pending，而是user
+  * 返回github/google用户信息后生成, 此时oauth用户的role已经不是pending，而是user
   */
-  public createUser(name: string, email: string, oauth: JsonValue) {
+  public createUser(id: string, name: string, email: string, oauth: JsonValue, source: UserType) {
     this.setId(uuidv4());
     this.setName(name);
-    this.setType(UserType.Github);
+    this.setType(source);
     this.setEmail(email);
+    this.setOauthId(id);
     this.setRole(Role.User);
     this.setOauth(oauth);
     return this.db.connect(`
-      insert into auth.user ("id", "name", "type", "email", "role", "oauth")
-        values ($1, $2, $3, $4, $5, $6)
-        on conflict ("name", "email", "oauth")
-        do update set "name"=$2, set "email"=$4, set "oauth"=$6
+      insert into auth.user ("id", "name", "type", "email", "role", "oauthId", "oauth")
+        values ($1, $2, $3, $4, $5, $6, $7)
+        on conflict ("oauthId")
+        do update set "name"=$2, "email"=$4, "oauth"=$7
         returning "id";
-    `, { isReturning: true, isTransaction: false }, [this.id, this.name, this.type, this.email, this.role, this.oauth]) as Promise<{
+    `, { isReturning: true, isTransaction: false }, [this.id, this.name, this.type, this.email, this.role, this.oauthId, this.oauth]) as Promise<{
       success: boolean;
       query: { id: string }[];
       error: Error | null;
     }>;
   }
   /** 
-  * github用户可以通过添加email和hash新建一个email账户
+  * oauth用户可以通过添加email和hash新建一个email账户
   */
 
   /** 
-  * update github用户的profile
+  * update oauth用户的profile
   */
   public updateUser(id: string, profile: JsonValue) {
     this.setId(id);

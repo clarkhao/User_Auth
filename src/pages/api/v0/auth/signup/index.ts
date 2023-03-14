@@ -11,7 +11,7 @@ import {
   verifySignupToken,
   checkUserRole,
 } from "src/service";
-import { debugLogger, logger } from "src/utils";
+import { debug, logger } from "src/utils";
 const config = require("config");
 /**
  * @swagger
@@ -67,7 +67,7 @@ async function SignUpHandler(req: NextApiRequest, res: NextApiResponse) {
     switch (req.method) {
       case "POST":
         LoggerMiddleware(req, res);
-        //decrypt req.body and verify signature
+        //decrypt req.body
         const { data, error } = DecryptMiddleware(req);
         if (error !== null) {
           throw error;
@@ -118,7 +118,7 @@ async function SignUpHandler(req: NextApiRequest, res: NextApiResponse) {
           );
           res.status(307).end();
         } else {
-          logger.warn({ err: 'failed to update role from pending to user' });
+          debug.error({ err: 'failed to update role from pending to user' });
           throw new Error(`500 inner server mistake`);
         }
         break;

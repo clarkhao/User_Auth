@@ -47,7 +47,8 @@ export type TRole = keyof typeof Role
 
 export enum UserType {
   Github = 'Github',
-  Email = 'Email'
+  Email = 'Email',
+  Google = 'Google'
 };
 export type TUserType = keyof typeof UserType
 /** 

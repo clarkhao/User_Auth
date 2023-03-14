@@ -13,3 +13,8 @@ export const SignupSchema = z.object({
   email: verify.email,
   password: verify.password
 })
+
+export const SigninNameSchema = z.object({
+  name: verify.name,
+  password: verify.password
+})

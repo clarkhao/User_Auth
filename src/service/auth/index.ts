@@ -1,21 +1,21 @@
-import { EmailUser } from "src/model";
+import { EmailUser } from "../../model";
 import {
   db,
   verify,
   SignupSchema,
   logger,
-  debugLogger,
+  debug,
   Mailer,
   generateToken,
   verifyToken,
   encrypt,
   decrypt,
   doHeavyWork,
-} from "src/utils";
-import type { MailResponse } from "src/utils";
+} from "../../utils";
+import type { MailResponse } from "../../utils";
 import { ZodError } from "zod";
 import Mail from "nodemailer/lib/mailer";
-import { Role } from "src/model/type";
+import { Role } from "../../model/type";
 const config = require("config");
 import path from 'path';
 
@@ -122,10 +122,10 @@ const sendEmailWithToken = async (token: string, email: string) => {
     )
     .then((info: MailResponse) => {
       const status = parseInt(info.response.split(" ")[0]);
-      debugLogger.debug(`email send status: ${status}`);
+      debug.error(`email send status: ${status}`);
     })
     .catch((err) => {
-      debugLogger.debug(err.message);
+      debug.error(err.message);
       logger.warn({ err });
     });
 };
@@ -164,7 +164,7 @@ const checkUserRole = async (id: string) => {
     if (error) {
       throw new Error(`500 inner server mistake`);
     }
-    debugLogger.debug(`current role: ${query[0].role}`);
+    debug.error(`current role: ${query[0].role}`);
     if (query[0].role != Role.Pending) {
       //查询会话状态
     }

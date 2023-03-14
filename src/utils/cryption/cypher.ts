@@ -1,4 +1,4 @@
-import { logger } from '../logger';
+import { debug } from '../logger';
 /**   
 * cipher 对称加解密
 */
@@ -16,7 +16,7 @@ function encrypt(data: string, secret: string) {
     const encrypted = Buffer.concat([cipher.update(data), cipher.final()]);
     return iv.toString('hex') + ':' + encrypted.toString('hex');
   } catch (error) {
-    logger.warn({ error, location: 'from utils/cryption/cypoher/encrypt' });
+    debug.error({ error, location: 'from utils/cryption/cypoher/encrypt' });
     throw new Error(`${error}`);
   }
 }
@@ -31,7 +31,7 @@ function decrypt(data: string, secret: string) {
     const decipher = crypto.createDecipheriv('aes-256-ctr', secret, iv);
     return Buffer.concat([decipher.update(encrypted), decipher.final()]).toString();
   } catch (error) {
-    logger.warn({ error, location: 'from utils/cryption/cypoher/decrypt' });
+    debug.error({ error, location: 'from utils/cryption/cypoher/decrypt' });
     throw new Error(`${error}`);
   }
 

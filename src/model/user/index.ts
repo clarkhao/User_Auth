@@ -11,6 +11,7 @@ class User {
   protected _role: Role = Role.Pending;
   protected _salt: string | null = null;
   protected _hash: string | null = null;
+  protected _oauthId: string | null = null;
   protected _profile: JsonValue = null;
   protected _oauth: JsonValue = null;
   protected db: PGConnect;
@@ -59,6 +60,12 @@ class User {
   get hash(): string | null {
     return this._hash;
   }
+  setOauthId(oauthId: string) {
+    this._oauthId = oauthId;
+  }
+  get oauthId(): string | null {
+    return this._oauthId;
+  }
   setProfile(profile: JsonValue) {
     this._profile = profile;
   }
@@ -106,16 +113,8 @@ class User {
   */
   public deleteUser(ids: string[]) {
     return this.db.connect(`
-      with delete_auth as (
-        delete from auth.auth as a
-        where a."userId"=any($1)
-        returning "userId" ad id
-      )
       delete from auth.user as u
-      using delete_auth
-      where u.id=any(
-        select "userId" from delete_auth
-      );
+      where u.id=any($1);
     `, { isReturning: false, isTransaction: false }, [ids]) as Promise<{
       success: boolean;
       query: null;

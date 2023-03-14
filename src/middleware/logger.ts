@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { logger, debugLogger } from '../utils/logger';
+import { logger } from '../utils/logger';
 /** 
 * 记录api访问
 * @params req

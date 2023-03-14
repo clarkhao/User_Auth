@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { Cryption } from 'src/utils';
-import { debugLogger } from 'src/utils';
+import { debug } from 'src/utils';
 /** 
 * @returns {data, error}, data is the decrypted
 */
@@ -10,7 +10,7 @@ const DecryptMiddleware = (req: NextApiRequest) => {
     const data = cryption.decryptData();
     return { data, error: null }
   } catch (err) {
-    debugLogger.debug(err);
+    debug.error(err);
     return { data: '', error: new Error('500 internal server mistake') };
   }
 }
