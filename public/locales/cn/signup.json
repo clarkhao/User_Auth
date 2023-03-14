@@ -1,0 +1,28 @@
+{
+  "left": {
+    "title": "与全球宠物爱好者连接",
+    "paragraph": "探索宠物生活的乐趣，与全球宠物爱好者分享你的独特故事。在这里，你可以和宠物一起享受美好的生活，还可以发现各种关于宠物的好玩、有趣的事情。"
+  },
+  "right": {
+    "title": "创建账户",
+    "signinHint": "已有账户直接登陆",
+    "email_title": "电子邮箱",
+    "email_err": "无效的电子邮箱格式",
+    "user_title": "用户名",
+    "user_min_err": "用户名至少5位字符",
+    "user_max_err": "用户名最多25位字符",
+    "user_regex_err": "用户名只能有字母数字组成",
+    "password_title": "密码",
+    "password_min_err": "至少6位字母数字",
+    "password_regex_err": "包含至少1位大写小写字母或数字",
+    "rePwd_title": "确认密码",
+    "rePwd_err": "两次输入密码不一致",
+    "privacy": "点击创建账户，同意隐私条款",
+    "submit": "创建账户",
+    "oauth_hint": "或者",
+    "oauth_github": "使用GITHUB登陆",
+    "oauth_google": "使用GOOGLE登陆",
+    "http_409_name": "用户名已被占用",
+    "http_409_email": "电子邮箱已被占用"
+  }
+}

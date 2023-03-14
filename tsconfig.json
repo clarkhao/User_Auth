@@ -15,7 +15,8 @@
     "isolatedModules": true,
     "jsx": "preserve",
     "jsxImportSource": "@emotion/react", //使用@emotion/react的css属性
-    "incremental": true
+    "incremental": true,
+    "downlevelIteration": true,
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
   "exclude": ["node_modules"]

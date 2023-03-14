@@ -1,0 +1,26 @@
+{
+  "left": {
+    "title": "Connect with Pet Lovers Worldwide",
+    "paragraph": "Discover the joy of pet life and share your unique stories with pet lovers around the world. Here, you can enjoy a wonderful life with your pets and discover all kinds of fun and interesting things about them."
+  },
+  "right": {
+    "title": "Create Account",
+    "signinHint": "Already have an account? Sign in here.",
+    "email_title": "Email Address",
+    "email_email": "Invalid email format",
+    "user_title": "Username",
+    "user_min": "Username must be at least 5 characters",
+    "user_max": "Username cannot be more than 25 characters",
+    "vregex": "Username can only contain letters and numbers",
+    "password_title": "Password",
+    "password_min": "Password must be at least 6 characters",
+    "password_regex": "Password must contain at least 1 uppercase letter, 1 lowercase letter, or 1 number",
+    "rePwd_title": "Confirm Password",
+    "rePwd_rePwd": "Passwords do not match",
+    "privacy": "By clicking Create Account, you agree to our Privacy Policy.",
+    "submit": "Create Account",
+    "oauth_hint": "Or",
+    "oauth_github": "Sign in with GitHub",
+    "oauth_google": "Sign in with Google"
+  }
+}
