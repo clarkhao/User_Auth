@@ -33,10 +33,15 @@ const logger = createLogger({
           return `${info.timestamp} [${info.level}]: ${JSON.stringify(info.message)}`;
         })
       )
-    }),
+    })
+  ]
+});
+
+const debug = createLogger({
+  transports: [
     new DailyRotateFile({
-      level: 'warn',
-      filename: 'logger/warn-%DATE%.log',
+      level: 'error',
+      filename: 'logger/debug-%DATE%.log',
       datePattern: 'YYYY-WW',
       zippedArchive: true,
       maxSize: '10m',
@@ -49,19 +54,6 @@ const logger = createLogger({
       )
     })
   ]
-});
-
-const debugLogger = createLogger({
-  transports: [
-    // Write debug logs to console
-    new transports.Console({
-      level: 'debug',
-      format: format.combine(
-        format.colorize(),
-        format.simple()
-      )
-    })
-  ]
 })
 
-export { logger, debugLogger };
+export { logger, debug };

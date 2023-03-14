@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { debugLogger } from 'src/utils';
+import { debug } from 'src/utils';
 
 const ErrorMiddleware = (err: unknown, res: NextApiResponse) => {
   try {
@@ -13,14 +13,14 @@ const ErrorMiddleware = (err: unknown, res: NextApiResponse) => {
     const num = parseInt(numStr);
     const statusCode = Number.isNaN(num) ? 500 : num;
     const message = Number.isNaN(num) ? errMsg : messageArray.join(' ');
-    if (statusCode > 499) {
-      debugLogger.debug(message);
-      res.status(statusCode).json({ msg: 'inner server mistake' });
+    if (statusCode === 500) {
+      debug.error(message);
+      res.status(500).json({ msg: 'inner server mistake' });
     } else {
       res.status(statusCode).json({ msg: message });
     }
   } catch (error) {
-    debugLogger.debug(error);
+    debug.error(error);
     res.status(500).json({ msg: 'inner server mistake' });
   }
 }

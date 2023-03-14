@@ -1,5 +1,5 @@
 import { Pool } from "pg";
-import { debugLogger } from '../logger';
+import { debug } from '../logger';
 const config = require('config');
 
 type Credentials = {
@@ -57,7 +57,7 @@ class PGConnect {
         }
       } catch (err) {
         options?.isTransaction && await client.query('ROLLBACK');
-        debugLogger.debug(`from db utils connect: ${err}`);
+        debug.error(`from db utils connect: ${err}`);
         let errMsg = '';
         if (err instanceof Error) {
           errMsg = err.message;

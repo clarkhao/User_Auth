@@ -1,12 +1,13 @@
 import axios from 'axios';
 
 //get github token with async http request.
-const getTokenFromGithub = (code: string) => {
-  const url = "https://github.com/login/oauth/access_token";
+const getTokenFromGoogle = (code: string) => {
+  const url = "https://oauth2.googleapis.com/token";
   const options = {
-    client_id: process.env.GITHUB_CLIENT_ID as string,
-    client_secret: process.env
-      .GITHUB_CLIENT_SECRET as string,
+    client_id: process.env.GOOGLE_CLIENT_ID as string,
+    client_secret: process.env.GOOGLE_CLIENT_SECRET as string,
+    redirect_uri: process.env.GOOGLE_REDIRECT_URL as string,
+    grant_type: 'authorization_code',
     code: code,
   };
   const qs = new URLSearchParams(options);
@@ -22,4 +23,4 @@ const getTokenFromGithub = (code: string) => {
   })
 }
 
-export { getTokenFromGithub }
+export { getTokenFromGoogle };

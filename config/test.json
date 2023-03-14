@@ -1,0 +1,34 @@
+{
+  "server": {
+    "host": "https://userauth.clarkhao.repl.co",
+    "port": 443
+  },
+  "key": {
+    "access": "JWT_ACCESS_KEY",
+    "refresh": "JWT_REFRESH_KEY",
+    "email": "JWT_EMAIL_KEY",
+    "cipher": "C_KEY"
+  },
+  "db": {
+    "host": "DB_HOST",
+    "user": "DB_ADMIN",
+    "name": "DB_NAME",
+    "pwd": "DB_PWD",
+    "port": 5432
+  },
+  "redis": {
+    "upurl": "REDIS_UP_URL",
+    "downurl": "REDIS_DOWN_URL"
+  },
+  "frontend": {
+    "home_page": "HOME_PAGE"
+  },
+  "pagination": {
+    "limit": 20
+  },
+  "mailer": {
+    "port": "MAIL_PORT",
+    "auth_user": "MAIL_USER",
+    "auth_pwd": "MAIL_PWD"
+  }
+}

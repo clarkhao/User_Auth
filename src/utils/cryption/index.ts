@@ -4,7 +4,7 @@
  */
 import crypto from 'crypto';
 const config = require('config');
-import { debugLogger } from '../index';
+import { debug } from '../index';
 
 class Cryption {
   private raw: string;
@@ -45,6 +45,7 @@ class Cryption {
       return decryptedString;
     } catch (error) {
       console.log(`${error}`);
+      debug.error(`from utils/index: ${error}`);
       throw error;
     }
   }

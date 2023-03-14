@@ -1,7 +1,7 @@
 import { UserType, Role, JsonValue } from '../type';
 import type { TUserInfo } from '../type';
 import { User } from './index';
-import { PGConnect, debugLogger } from 'src/utils';
+import { PGConnect } from 'src/utils';
 import crypto from 'crypto';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -60,30 +60,20 @@ class EmailUser extends User {
   }
   /** 
   * read user by name/email and hash，确认用户输入账户和密码是否匹配，name或者email，使用validation确认
+  * 分两步，第一步，read salt by user name,确认是否存在user name,然后读取salt和hash
+  * 第二步，通过salt和password计算出hash后，比对DB中的hash
   */
-  public readUserByName(name: string, hash: string, type: string) {
-    this.setHash(hash);
-    switch (type) {
-      case 'name':
-        this.setName(name);
-        return this.db.connect(`
-          select 
-          case 
-            when (SELECT COUNT(*) FROM auth.user WHERE name = $1 && type = $3) > 0
-            then
-              case
-                when (select hash from auth.user WHERE name = $1 && type = $3) = $2
-                then true
-                else false
-              end as hash
-            else false
-          end as is user;
-        `, { isReturning: false, isTransaction: false }, [name, hash, UserType.Email]) as Promise<{
-          success: boolean;
-          query: { user: boolean }[] | { user: { hash: boolean } }[];
-          error: Error | null;
-        }>;
-    }
+  public readUserByName(name: string) {
+    this.setName(name);
+    this.setType(UserType.Email);
+    return this.db.connect(`
+          select id, salt, hash from auth.user as u
+          where u.name=$1 and u.type=$2;
+        `, { isReturning: false, isTransaction: false }, [this.name, this.type]) as Promise<{
+      success: boolean;
+      query: { id: string, salt: string, hash: string }[];
+      error: Error | null;
+    }>;
   }
   /** 
   * 如果property是'name'则更新name和profile,如果property是email,则更新email和hash，默认更新role为user或者admin
