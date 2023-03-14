@@ -1,0 +1,35 @@
+.input {
+  display: none;
+}
+.label {
+  cursor: pointer;
+  width: var(--toggle-size);
+  height: calc(var(--toggle-size)/2);
+  background: var(--switch-bg);
+  display: block;
+  position: relative;
+  border-radius: calc(var(--toggle-size) * 0.25);
+  box-shadow: var(--toggle-box-shadow);
+}
+.toggle {
+  width: calc(var(--toggle-size) * 0.5 - 10px);
+  height: calc(var(--toggle-size) * 0.5 - 10px);
+  position: absolute;
+  background-color: var(--switch-btn-color);
+  top: 5px;
+  left: 5px;
+  transition: 0.3s;
+  border-radius: 50%;
+}
+.input:checked + label span {
+  left: calc(var(--toggle-size) * 0.5 + 5px);
+}
+.toggle svg {
+  position: absolute;
+  top: 0; right: 0; bottom: 0; left: 0;
+  margin: auto;
+  width: calc(var(--toggle-size) * 0.3);
+  height: auto;
+  fill: yellow;
+  color: orange;
+}

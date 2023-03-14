@@ -1,0 +1,73 @@
+.container {
+  width: var(--success-size);
+  height: var(--success-size);
+  position: relative;
+}
+.outer {
+  width: 90%;
+  height: 90%;
+  background-image: conic-gradient(
+    var(--success-bg) 0deg,
+    var(--success-inner-bg) 0deg
+  );
+  border-radius: 50%;
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  margin: auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.inner {
+  width: 80%;
+  height: 80%;
+  background-color: var(--success-inner-bg);
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.inner svg {
+  color: white;
+  width: 0px;
+  height: auto;
+}
+.entering {
+  transform: scale(1.2);
+}
+.entered {
+  width: 55%;
+  height: 55%;
+  transition: all 0.5s;
+}
+.entering .inner {
+  width: 75%;
+  height: 75%;
+  background-color: var(--success-bg);
+}
+.entered .inner {
+  width: 9%;
+  height: 9%;
+  background-color: var(--success-bg);
+}
+.exiting .inner {
+  width: 15%;
+  height: 15%;
+  background-color: var(--success-bg);
+}
+.exited .inner {
+  width: 90%;
+  height: 90%;
+  transition: all 0.5s;
+  background-color: var(--success-bg);
+}
+.exiting .inner svg {
+  width: 5%;
+}
+.exited .inner svg {
+  width: 90%;
+  transition: all 0.5s;
+}

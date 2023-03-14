@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { ErrorMiddleware } from "src/middleware/error";
-import { getCodeFromOauth, getTokenFromGoogle, getUserInfoWithToken, createOauthUser, saveSession } from 'src/service';
+import { getCodeFromOauth, getTokenFromGoogle, getUserInfoWithToken, createOauthUser, saveOauthSession } from 'src/service';
 import { UserType } from 'src/model/type';
 /**
 * @swagger
@@ -33,7 +33,7 @@ async function googleOauthHandler(req: NextApiRequest, res: NextApiResponse) {
           }).then(async ({ info, token }) => {
             console.log(`info: ${info}`);
             const { id } = await createOauthUser(info, UserType.Google);
-            const { success, accessToken } = await saveSession(id, token, info, 'google');
+            const { success, accessToken } = await saveOauthSession(id, token, info, 'google');
             res.status(201).json({ token: accessToken });
           }).catch(err => {
             console.log(`${err}`);

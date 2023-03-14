@@ -1,0 +1,51 @@
+.success-enter {
+  background-image: conic-gradient(
+    var(--success-bg) 3.6deg,
+    var(--success-inner-bg) 0deg
+  );
+}
+.success-enter-active {
+  background-image: conic-gradient(
+    var(--success-bg) 36deg,
+    var(--success-inner-bg) 0deg
+  );
+  transition: all 0.5s;
+}
+.success-exit {
+  transform: scale(0.8);
+  transition: all 0.5s;
+}
+/* */
+.success-enter .inner {
+  width: 75%;
+  height: 75%;
+  background-color: 'white';
+}
+.success-exit .inner {
+  width: 15%;
+  height: 15%;
+  background-color: var(--success-bg);
+}
+.success-exit-active .inner {
+  width: 90%;
+  height: 90%;
+  transition: all 0.5s;
+  background-color: var(--success-bg);
+}
+.success-exit-done .inner {
+  width: 90%;
+  height: 90%;
+  background-color: var(--success-bg);
+}
+/* */
+.success-exit .inner svg {
+  width: 5%;
+  transition: all 0.5s;
+}
+.success-exit-active .inner svg {
+  width: 90%;
+  
+}
+.success-exit-done .inner svg {
+  width: 90%;
+}

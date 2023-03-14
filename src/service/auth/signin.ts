@@ -1,5 +1,5 @@
 import {
-  SigninNameSchema, db, redisUpClient, generateToken
+  SigninNameSchema, db, redisUpClient, generateToken, debug
 } from '../../utils';
 import { ZodError } from "zod";
 import { EmailUser } from '../../model';
@@ -40,7 +40,7 @@ const isMatchUser = async (data: SignIn) => {
 /** 
 * 
 */
-const saveSession = (id: string, name: string) => {
+const saveSession = async (id: string, name: string) => {
   try {
     const accessToken = generateToken(id, process.env[config.get('key.access')] as string, '3h');
     const refreshToken = generateToken(id, process.env[config.get('key.refresh')] as string, '3 days');

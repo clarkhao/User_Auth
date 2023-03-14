@@ -65,7 +65,7 @@ async function SignInHandler(req: NextApiRequest, res: NextApiResponse) {
         //match -> token, not match -> error
         if (isMatched) {
           //generate access token and refresh token
-          const { success, accessToken, refreshToken } = saveSession(id, signinData.name);
+          const { success, accessToken, refreshToken } = await saveSession(id, signinData.name);
           res.status(200).send('ok')
         } else {
           res.status(401).send('not match')

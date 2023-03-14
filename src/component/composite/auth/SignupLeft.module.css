@@ -1,0 +1,24 @@
+.container {
+  width: 100%;
+  max-width: 500px;
+  min-width: 300px;
+  height: 100%;
+  background-image: linear-gradient(var(--signup-left-bg),var(--signup-left-bottom-bg));
+  color: white;
+  box-shadow: var(--signup-left-shadow);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.container h2, .container p {
+  padding: 0 20px;
+}
+.container p {
+  font-size: .9rem;
+}
+.animate {
+  flex: 1 0 auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

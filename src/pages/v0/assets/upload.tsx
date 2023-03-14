@@ -9,8 +9,8 @@ import React from 'react';
 import style from '../../styles/assetsUpload.module.css';
 import { PaletteMode, createTheme, ThemeProvider } from '@mui/material';
 //组件
-import CardLayout from "../../../component/layout/card";
-import Upload from '../../../component/composite/upload';
+import CardLayout from "src/component/layout/CardLayout";
+import Upload from 'src/component/composite/assets/Uploader';
 
 export default function UploadPage({}) {
     

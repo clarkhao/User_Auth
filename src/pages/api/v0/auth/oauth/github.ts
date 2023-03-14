@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { getCodeFromOauth, getTokenFromGithub, getUserInfoWithToken, createOauthUser, saveSession } from 'src/service';
+import { getCodeFromOauth, getTokenFromGithub, getUserInfoWithToken, createOauthUser, saveOauthSession } from 'src/service';
 import { generateToken } from 'src/utils';
 import { ErrorMiddleware } from "src/middleware/error";
 import { UserType } from 'src/model/type';
@@ -36,7 +36,7 @@ async function oauthHandler(req: NextApiRequest, res: NextApiResponse) {
           }).then(async ({ info, token }) => {
             console.log(`info: ${info}`);
             const { id } = await createOauthUser(info, UserType.Github);
-            const { success, accessToken } = await saveSession(id, token, info, 'github');
+            const { success, accessToken } = await saveOauthSession(id, token, info, 'github');
             res.status(201).json({ token: accessToken });
           }).catch(err => {
             console.log(`${err}`);

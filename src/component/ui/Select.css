@@ -1,0 +1,9 @@
+.i18n-btn {
+  cursor: pointer;
+}
+ul.i18n-show {
+  visibility: visible;
+  opacity: 1;
+  top: 110%;
+  transition: all 0.5s;
+}
