@@ -5,6 +5,17 @@ import type { NextRequest } from 'next/server';
 export function middleware(request: NextRequest) {
   const response = NextResponse.next();
   /** 
+  * 部分优化
+  */
+  response.headers.set('X-DNS-Prefetch-Control', 'on');
+  /** 
+  * CORS
+  */
+  response.headers.set('Access-Control-Allow-Origin', 'http://localhost:3000');
+  response.headers.set('Access-Control-Allow-Method', '*');
+  response.headers.set('Access-Control-Allow-Headers', 'Cookie');
+  response.headers.set('Access-Control-Allow-Credentials', 'true');
+  /** 
   * for security 除了swagger doc页面
   */
   if (!request.nextUrl.pathname.startsWith('/docs')) {
@@ -26,15 +37,7 @@ export function middleware(request: NextRequest) {
       response.headers.set('Cache-Control', 'public, max-age=604800');
     }
   }
-  /** 
-  * 部分优化
-  */
-  response.headers.set('X-DNS-Prefetch-Control', 'on');
-  /** 
-  * CORS
-  */
-  response.headers.set('Access-control-allow-origin', 'http://192.168.3.55:3000');
-  response.headers.set('Access-control-allow-method', '*');
+  
 
   return response;
 }

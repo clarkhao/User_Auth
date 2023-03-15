@@ -2,7 +2,8 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { LoggerMiddleware } from "src/middleware/logger";
 import { ErrorMiddleware } from "src/middleware/error";
 import { DecryptMiddleware } from "src/middleware/decrypt";
-import { verifySigninData, isMatchUser, saveSession } from 'src/service';
+import { verifySigninData, isMatchUser, saveSession, redirectToOauth } from 'src/service';
+import { setCookie } from 'src/middleware/cookie';
 
 /**
 * @swagger
@@ -62,7 +63,15 @@ async function SignInHandler(req: NextApiRequest, res: NextApiResponse) {
     switch (req.method) {
       case "GET":
         /*前端弹窗登录，到达后端记录保存req.url到session，登录成功后调出session/redis, 跳转*/
-
+        const oauth = req.query.oauth as string;
+        const from = req.query.from as string || '/';
+        if (oauth === undefined)
+          res.status(400).json({ msg: 'oauth query string missting' });
+        console.log(`req.url: ${req.url}`);
+        setCookie(from, 'originalUrl', 5, res);
+        console.log(oauth);
+        res.redirect(redirectToOauth(oauth));
+        break;
       case "POST":
         LoggerMiddleware(req, res);
         //decrypt req.body

@@ -89,5 +89,29 @@ const saveOauthSession = async (id: string, token: string, info: JsonObject, sou
     }
   }
 }
-
-export { getCodeFromOauth, getUserInfoWithToken, createOauthUser, saveOauthSession };
+/**
+ * to get oauth request url
+ */
+const redirectToOauth = (oauth: string) => {
+  if(oauth === 'github') {
+    const rootURl = "https://github.com/login/oauth/authorize";
+    const options = {
+      client_id: process.env.GITHUB_CLIENT_ID as string,
+      redirect_uri: process.env.GITHUB_OAUTH_REDIRECT_URL as string,
+      scope: "user:email",
+    };
+    const qs = new URLSearchParams(options);
+    return `${rootURl}?${qs.toString()}`;
+  } else {
+    const rootURl = "https://accounts.google.com/o/oauth2/auth";
+    const options = {
+      client_id: process.env.GOOGLE_CLIENT_ID as string,
+      redirect_uri: process.env.GOOGLE_REDIRECT_URL as string,
+      scope: "email profile",
+      response_type: 'code',
+    };
+    const qs = new URLSearchParams(options);
+    return `${rootURl}?${qs.toString()}`;
+  }
+}
+export { getCodeFromOauth, getUserInfoWithToken, createOauthUser, saveOauthSession, redirectToOauth };
