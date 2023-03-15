@@ -3,6 +3,7 @@ import {
 } from '../../utils';
 import { ZodError } from "zod";
 import { EmailUser } from '../../model';
+import { Role } from '../../model/type'
 import crypto from 'crypto';
 const config = require('config');
 
@@ -31,8 +32,12 @@ const isMatchUser = async (data: SignIn) => {
     if (error !== null) {
       throw error;
     }
-    const hash = crypto.pbkdf2Sync(data.password, query[0].salt, 1000, 64, `sha512`).toString(`hex`);
-    return { isMatched: hash === query[0].hash, id: query[0].id };
+    if (typeof query[0].user === 'boolean') {
+      throw new Error(`400 wrong user name`);
+    } else {
+      const hash = crypto.pbkdf2Sync(data.password, query[0].user.salt, 1000, 64, `sha512`).toString(`hex`);
+      return { isMatched: hash === query[0].user.hash, pending: query[0].user.role === Role.Pending, id: query[0].user.id, name: data.name};
+    }
   } catch (err) {
     throw new Error(`500 from service/auth/signin mistake`);
   }
@@ -40,21 +45,21 @@ const isMatchUser = async (data: SignIn) => {
 /** 
 * 
 */
-const saveSession = async (id: string, name: string) => {
+const saveSession = async (pending: boolean, id: string, name: string) => {
   try {
     const accessToken = generateToken(id, process.env[config.get('key.access')] as string, '3h');
     const refreshToken = generateToken(id, process.env[config.get('key.refresh')] as string, '3 days');
     const session = {
       id,
       token: refreshToken,
-      userInfo: { name },
+      userInfo: { name, pending },
       source: 'email'
     };
     const sessionStr = JSON.stringify(session);
     const sessionBase64 = Buffer.from(sessionStr).toString('base64');
     //return "OK" if saved OK
     const save = await redisUpClient.set(accessToken, sessionStr);
-    return { success: save === 'OK', accessToken, refreshToken };
+    return { success: save === 'OK', accessToken };
   } catch (err) {
     debug.error(`from service/oauth/index: ${err}`)
     if (err instanceof Error) {

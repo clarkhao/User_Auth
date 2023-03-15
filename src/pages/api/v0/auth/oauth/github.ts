@@ -17,14 +17,23 @@ import { UserType } from 'src/model/type';
 *         description: The code sent by Github which will be used for token fetch
 *     responses:
 *       201:
+*         description: signin with oauth successfully, send tokens
+*         content:
+*           application/json:
+*             schema:
+*               $ref: '#/components/schemas/Token'
+*               example:
 *       500:
+*         description inner server mistake due to db or redis i/o or others
 *       502:
+*         description: upstream mistake
 */
 
 async function oauthHandler(req: NextApiRequest, res: NextApiResponse) {
   try {
     switch (req.method) {
       case 'GET':
+        //cliend side make request like xxx.com/xxx?code=xxx
         getCodeFromOauth(req.query as Record<string, string>)
           .then((code) => {
             console.log(`code: ${code}`);

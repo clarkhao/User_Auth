@@ -10,6 +10,14 @@ export const schemas = {
       }
     }
   },
+  Token: {
+    type: 'object',
+    properties: {
+      token: {
+        type: 'string'
+      }
+    }
+  },
   User: {
     type: 'object',
     properties: {

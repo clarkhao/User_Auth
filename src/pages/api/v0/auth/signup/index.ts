@@ -108,7 +108,7 @@ async function SignUpHandler(req: NextApiRequest, res: NextApiResponse) {
         }
         //确认是否pending, if pending turn pending into user,
         //otherwise check authentication, if already in, do nothing just send status 200,
-        // else redirect to login page with status code 307
+        //else redirect to login page with status code 307
         //update the user
         const update = await checkUserRole(userId);
         if (update) {

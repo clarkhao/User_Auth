@@ -15,12 +15,21 @@ import { UserType } from 'src/model/type';
 *         description: The code sent by Google which will be used for token fetch
 *     responses:
 *       201:
+*         description: signin with oauth successfully, send tokens
+*         content:
+*           application/json:
+*             schema:
+*               $ref: '#/components/schemas/Token'
+*               example:
 *       500:
+*         description inner server mistake due to db or redis i/o or others
 *       502:
+*         description: upstream mistake
 */
 async function googleOauthHandler(req: NextApiRequest, res: NextApiResponse) {
   try {
     switch (req.method) {
+      //check header referer, if exists, then 307 else 201
       case 'GET':
         getCodeFromOauth(req.query as Record<string, string>)
           .then((code) => {

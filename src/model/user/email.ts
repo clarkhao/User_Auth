@@ -60,18 +60,25 @@ class EmailUser extends User {
   }
   /** 
   * read user by name/email and hash，确认用户输入账户和密码是否匹配，name或者email，使用validation确认
-  * 分两步，第一步，read salt by user name,确认是否存在user name,然后读取salt和hash
-  * 第二步，通过salt和password计算出hash后，比对DB中的hash
+  * 分两步，第一步，确认user是否存在，如果存在确认role pending or user
+  * 第二步，如果pending返回，如果user返回
   */
   public readUserByName(name: string) {
     this.setName(name);
     this.setType(UserType.Email);
     return this.db.connect(`
-          select id, salt, hash from auth.user as u
-          where u.name=$1 and u.type=$2;
-        `, { isReturning: false, isTransaction: false }, [this.name, this.type]) as Promise<{
+        with exist_user as (
+          select * from auth.user WHERE name = $1 and type = $2
+        ) 
+        select 
+        case 
+          when (select count(*) form exist_user) = 0
+          then false
+          else (select id, salt, hash, role from exist_user)          
+        end as user;
+      `, { isReturning: false, isTransaction: false }, [this.name, this.type, Role.Pending]) as Promise<{
       success: boolean;
-      query: { id: string, salt: string, hash: string }[];
+      query: { user: boolean | {id: string, salt: string, hash: string, role: Role} }[];
       error: Error | null;
     }>;
   }
