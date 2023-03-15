@@ -60,7 +60,7 @@ async function oauthHandler(req: NextApiRequest, res: NextApiResponse) {
           redirect = originalUrl.cookie;
           console.log(redirect);
           setCookie(accessToken, 'token', 200, res, true);
-          res.status(307).redirect('http://localhost:3000/auth/success');
+          res.status(307).redirect('http://localhost:3000/v0/auth/success');
         break;
       default:
         res.status(405).send("Method not allowed");
