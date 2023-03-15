@@ -159,31 +159,7 @@ function SignupRight({ i18n, ...props }: TSignupRight) {
       console.log(`${error}`);
     }
   };
-  const handleGithub = (e: React.MouseEvent) => {
-    const rootURl = "https://github.com/login/oauth/authorize";
-    const options = {
-      client_id: process.env.NEXT_PUBLIC_GITHUB_CLIENT_ID as string,
-      redirect_uri: process.env
-        .NEXT_PUBLIC_GITHUB_OAUTH_REDIRECT_URL as string,
-      scope: "user:email",
-    };
-    const qs = new URLSearchParams(options);
-    const url = `${rootURl}?${qs.toString()}`;
-    router.push(url);
-  };
-  const handleGoogle = (e: React.MouseEvent) => {
-    const rootURl = "https://accounts.google.com/o/oauth2/auth";
-    const options = {
-      client_id: process.env.NEXT_PUBLIC_Google_CLIENT_ID as string,
-      redirect_uri: process.env
-        .NEXT_PUBLIC_GOOGLE_OAUTH_REDIRECT_URL as string,
-      scope: "email profile",
-      response_type: 'code',
-    };
-    const qs = new URLSearchParams(options);
-    const url = `${rootURl}?${qs.toString()}`;
-    router.push(url);
-  }
+  
   return (
     <div
       className={style.container}
@@ -251,7 +227,7 @@ function SignupRight({ i18n, ...props }: TSignupRight) {
             variant="contained"
             startIcon={iconLibrary.get("github")}
             color="info"
-            onClick={handleGithub}
+            onClick={() => router.push(`/api/v0/auth/signin?oauth=github`)}
           >
             {i18n?.oauth_github}
           </Button>
@@ -259,7 +235,7 @@ function SignupRight({ i18n, ...props }: TSignupRight) {
             variant="contained"
             startIcon={iconLibrary.get("google")}
             color="warning"
-            onClick={handleGoogle}
+            onClick={() => router.push(`/api/v0/auth/signin?oauth=google`)}
           >
             {i18n?.oauth_google}
           </Button>

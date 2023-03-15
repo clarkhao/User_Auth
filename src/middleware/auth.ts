@@ -3,7 +3,7 @@ import { generateToken, verifyToken } from 'src/utils';
 const config = require('config');
 
 /** 
-* access token from header, and refresh token from cookie
+* access token from header, and refresh token from redis
 * validate access token first, if token ok then pass, else validate refresh token
 * judge access token source, email/github/google?
 * if both token expires, log out, close session and redirect to login page

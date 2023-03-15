@@ -3,6 +3,7 @@ import { getCodeFromOauth, getTokenFromGithub, getUserInfoWithToken, createOauth
 import { generateToken } from 'src/utils';
 import { ErrorMiddleware } from "src/middleware/error";
 import { UserType } from 'src/model/type';
+import { setCookie, getCookie } from 'src/middleware/cookie';
 
 /**
 * @swagger
@@ -33,8 +34,8 @@ async function oauthHandler(req: NextApiRequest, res: NextApiResponse) {
   try {
     switch (req.method) {
       case 'GET':
-        //cliend side make request like xxx.com/xxx?code=xxx
-        getCodeFromOauth(req.query as Record<string, string>)
+        //client side make request like xxx.com/xxx?code=xxx
+        const { success, accessToken } = await getCodeFromOauth(req.query as Record<string, string>)
           .then((code) => {
             console.log(`code: ${code}`);
             return getTokenFromGithub(code);
@@ -45,12 +46,21 @@ async function oauthHandler(req: NextApiRequest, res: NextApiResponse) {
           }).then(async ({ info, token }) => {
             console.log(`info: ${info}`);
             const { id } = await createOauthUser(info, UserType.Github);
-            const { success, accessToken } = await saveOauthSession(id, token, info, 'github');
-            res.status(201).json({ token: accessToken });
+            return saveOauthSession(id, token, info, 'github');
           }).catch(err => {
             console.log(`${err}`);
             throw new Error(`502 Upstream Server is Temporaly not Available`);
           })
+          if(!success)
+            throw new Error('500 failed to write to Redis');
+          const originalUrl = getCookie('originalUrl', req);
+          let redirect = '';
+          if(originalUrl.error !== null)
+            redirect = '/';
+          redirect = originalUrl.cookie;
+          console.log(redirect);
+          setCookie(accessToken, 'token', 200, res, true);
+          res.status(307).redirect('http://localhost:3000/auth/success');
         break;
       default:
         res.status(405).send("Method not allowed");

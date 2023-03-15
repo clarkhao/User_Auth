@@ -9,7 +9,7 @@ export {
 } from './auth';
 
 export { getTokenFromGithub } from './oauth/github';
-export { getCodeFromOauth, getUserInfoWithToken, createOauthUser, saveOauthSession } from './oauth';
+export { getCodeFromOauth, getUserInfoWithToken, createOauthUser, saveOauthSession, redirectToOauth } from './oauth';
 export { getTokenFromGoogle } from './oauth/google';
 
 export { verifySigninData, isMatchUser, saveSession } from './auth/signin';

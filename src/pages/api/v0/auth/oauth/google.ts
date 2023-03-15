@@ -2,6 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { ErrorMiddleware } from "src/middleware/error";
 import { getCodeFromOauth, getTokenFromGoogle, getUserInfoWithToken, createOauthUser, saveOauthSession } from 'src/service';
 import { UserType } from 'src/model/type';
+import { setCookie, getCookie } from 'src/middleware/cookie';
 /**
 * @swagger
 * /api/v0/auth/oauth/google:
@@ -31,7 +32,7 @@ async function googleOauthHandler(req: NextApiRequest, res: NextApiResponse) {
     switch (req.method) {
       //check header referer, if exists, then 307 else 201
       case 'GET':
-        getCodeFromOauth(req.query as Record<string, string>)
+        const { success, accessToken } = await getCodeFromOauth(req.query as Record<string, string>)
           .then((code) => {
             console.log(`code: ${code}`);
             return getTokenFromGoogle(code);
@@ -42,12 +43,22 @@ async function googleOauthHandler(req: NextApiRequest, res: NextApiResponse) {
           }).then(async ({ info, token }) => {
             console.log(`info: ${info}`);
             const { id } = await createOauthUser(info, UserType.Google);
-            const { success, accessToken } = await saveOauthSession(id, token, info, 'google');
-            res.status(201).json({ token: accessToken });
+            return saveOauthSession(id, token, info, 'google');
           }).catch(err => {
             console.log(`${err}`);
             throw new Error(`502 Upstream Server is Temporaly not Available`);
           })
+          if(!success)
+            throw new Error('500 failed to write to Redis');
+          const originalUrl = getCookie('originalUrl', req);
+          let redirect = '';
+          if(originalUrl.error !== null)
+            redirect = '/';
+          redirect = originalUrl.cookie;
+          console.log(redirect);
+          setCookie(accessToken, 'token', 2, res, true);
+          res.setHeader('Location', 'http://localhost:3000/auth/success');
+          res.status(301).end();
         break;
       default:
         res.status(405).send("Method not allowed");
