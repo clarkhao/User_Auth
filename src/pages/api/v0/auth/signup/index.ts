@@ -24,6 +24,12 @@ const config = require("config");
  *         application/x-www-form-urlencoded:
  *           schema:
  *             $ref: '#components/schemas/Encrypted'
+ *     parameters:
+ *       - in: query
+ *           name: locale
+ *           schema:
+ *             type: string
+ *           description: indicate locale
  *     responses:
  *       201:
  *         description: craete user with pending role in db and send a email confirmation with token inside url
@@ -64,9 +70,10 @@ const config = require("config");
 
 async function SignUpHandler(req: NextApiRequest, res: NextApiResponse) {
   try {
+    LoggerMiddleware(req, res);
+    const locale = req.query['locale'] as string;
     switch (req.method) {
       case "POST":
-        LoggerMiddleware(req, res);
         //decrypt req.body
         const { data, error } = DecryptMiddleware(req);
         if (error !== null) {
@@ -83,7 +90,7 @@ async function SignUpHandler(req: NextApiRequest, res: NextApiResponse) {
             return;
           } else {
             //send email for confirmation
-            sendEmailWithToken(token, signupData.email);
+            sendEmailWithToken(token, signupData.email, locale || 'cn');
           }
         });
         //response
@@ -101,7 +108,7 @@ async function SignUpHandler(req: NextApiRequest, res: NextApiResponse) {
             if (token instanceof Error) {
               return;
             } else {
-              sendEmailWithToken(token, signupData.email);
+              sendEmailWithToken(token, signupData.email, locale || 'cn');
             }
           });
           res.status(301).end();
@@ -114,11 +121,11 @@ async function SignUpHandler(req: NextApiRequest, res: NextApiResponse) {
         if (update) {
           res.setHeader(
             "location",
-            `${config.get("server.host").concat("/auth/login")}`
+            `${config.get("server.host").concat("/v0/auth/login")}`
           );
           res.status(307).end();
         } else {
-          debug.error({ err: 'failed to update role from pending to user' });
+          debug.error({ err: "failed to update role from pending to user" });
           throw new Error(`500 inner server mistake`);
         }
         break;

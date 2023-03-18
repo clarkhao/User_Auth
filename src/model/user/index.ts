@@ -87,7 +87,7 @@ class User {
       select "id","name","type","email","role","createAt","lastUpdateAt","profile","oauth"
       from auth.user
       where id=$1;
-    `, { isReturning: false, isTransaction: false }, [id]) as Promise<{
+    `, { isReturning: false, isTransaction: false }, [this.id]) as Promise<{
       success: boolean;
       query: TUserInfo[];
       error: Error | null;

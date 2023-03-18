@@ -119,9 +119,9 @@ function SignupRight({ i18n, ...props }: TSignupRight) {
         //encrypt data
         const encrypted = await hybridEncrypt(verified.data);
         //post data
-        fetch("https://userauth.clarkhao.repl.co/api/v0/auth/signup", {
+        fetch(`${process.env.NEXT_PUBLIC_ORIGIN}/api/v0/auth/signup?locale=${locale}`, {
           method: "POST",
-          mode: "cors",
+          mode: 'no-cors',
           body: new URLSearchParams({ data: encrypted }),
           cache: "no-cache",
           redirect: "follow",
@@ -134,7 +134,7 @@ function SignupRight({ i18n, ...props }: TSignupRight) {
           )["msg"];
           switch (response.status) {
             case 201:
-              router.push("/auth/success");
+              router.push("/v0/auth/success/signup");
               break;
             case 409:
               setErrMsgs({
@@ -159,7 +159,7 @@ function SignupRight({ i18n, ...props }: TSignupRight) {
       console.log(`${error}`);
     }
   };
-  
+
   return (
     <div
       className={style.container}
@@ -168,6 +168,7 @@ function SignupRight({ i18n, ...props }: TSignupRight) {
         --signup-right-font-color: ${theme.palette.text.primary};
         --signup-right-shadow: ${theme.shadows[4]};
         --signup-right-link-color: ${theme.palette.primary.main};
+        --signup-right-oauth-font-color: ${theme.palette.background.default}
       `}
     >
       <header>
@@ -227,17 +228,19 @@ function SignupRight({ i18n, ...props }: TSignupRight) {
             variant="contained"
             startIcon={iconLibrary.get("github")}
             color="info"
-            onClick={() => router.push(`/api/v0/auth/signin?oauth=github`)}
           >
-            {i18n?.oauth_github}
+            <Link href={`/api/v0/auth/signin?oauth=github&locale=${locale}`}>
+              {i18n?.oauth_github}
+            </Link>
           </Button>
           <Button
             variant="contained"
             startIcon={iconLibrary.get("google")}
             color="warning"
-            onClick={() => router.push(`/api/v0/auth/signin?oauth=google`)}
           >
-            {i18n?.oauth_google}
+            <Link href={`/api/v0/auth/signin?oauth=google&locale=${locale}`}>
+              {i18n?.oauth_google}
+            </Link>
           </Button>
         </div>
       </footer>

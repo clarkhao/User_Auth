@@ -18,6 +18,9 @@ import Mail from "nodemailer/lib/mailer";
 import { Role } from "../../model/type";
 const config = require("config");
 import path from 'path';
+import EmailTemplate from './emailComponent';
+import {renderToString} from 'react-dom/server';
+import { createElement } from "react";
 
 const SECRET_KEY = process.env[config.get("key.cipher")] || "";
 const EXPIRY_DURATION = 3600; // Expiry duration in seconds (1 hour)
@@ -105,20 +108,23 @@ const generateSignupToken = async (userId: string) => {
  * @param id: user table id returned by creatUser
  * @param email: email in signup data
  */
-const sendEmailWithToken = async (token: string, email: string) => {
+const sendEmailWithToken = async (token: string, email: string, locale: string) => {
   const mailer = new Mailer();
   const url = config
     .get("server.host")
     ?.concat(`:${config.get("server.port")}`)
-    .concat(`/api/v0/auth/signup?code=${token}`);
+    .concat(`/api/v0/auth/signup?locale=${locale}&code=${token}`);
+  //此处使用mdx替换
+  const title: {[key: string]: string} = {
+    'cn': '注册确认',
+    'en': 'Registration Confirmation',
+    'jp': '登録確認'
+  }
   mailer
     .sendMail(
       email,
-      `注册确认`,
-      `<div>
-    please click the following url for completing the signup
-    <a href="${url}">${url}</a>
-    </div>`
+      title[locale],
+      renderToString(createElement(EmailTemplate, {'url': url, 'locale': locale}))
     )
     .then((info: MailResponse) => {
       const status = parseInt(info.response.split(" ")[0]);
