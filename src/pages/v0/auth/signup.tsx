@@ -1,8 +1,7 @@
 //应用模块
 import React, { Fragment } from "react";
-import fs from "fs";
-import path from "path";
 import type { GetStaticProps, NextPage } from "next";
+import {readI18nFiles} from 'src/utils';
 //style和主题
 import style from "./signup.module.css";
 import { useTheme } from "@mui/material/styles";
@@ -39,27 +38,12 @@ const SignupPage: NextPage<SignupProps> = (props) => {
 };
 
 export const getStaticProps: GetStaticProps<SignupProps> = async (context) => {
-  const i18nDir = path.join(process.cwd(), "/public/locales");
   const fileName = (__filename.split("/").reverse()[0] as string).split(".")[0];
-  const filePath = path.join(i18nDir, `/${context.locale}/${fileName}.json`);
-  console.log(filePath);
-  let i18n: Signup = { left: {}, right: {} };
-  try {
-    let data = '';
-    const stream = fs.createReadStream(filePath, {encoding: 'utf-8'});
-    i18n = await new Promise((resolve, reject) => {
-      stream.on('data', (chunk) => {
-        data += chunk;
-      })
-      stream.on('end', () => {
-        resolve(JSON.parse(data));
-      })
-      stream.on('error', (err) => {
-        throw new Error(err.stack);
-      })
-    })
-  } catch (err) {
-    console.error(`Error reading file: ${err}`);
+  const i18n = await readI18nFiles(context, fileName) as Signup;
+  if(!i18n) {
+    return {
+      notFound: true
+    }
   }
   return {
     props: {

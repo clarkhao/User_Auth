@@ -13,17 +13,21 @@ type TSuccess = {
    * text content
    */
   content: { [key: string]: string };
+  /**
+   * signin success or signup success?
+   */
+  isSignup: boolean;
 };
 
-function Success({ content, ...props }: TSuccess) {
+function Success({ content,isSignup, ...props }: TSuccess) {
   return (
     <div className={style.container}>
       <Complete size="180px" />
-      <h3>注册成功</h3>
+      <h3>{content?.title}</h3>
       <div className={style.content}>
-        <div>现在可以登陆您的账户</div>
+        <div>{content?.guideline}</div>
         <Button variant="contained" color="success">
-          登陆
+          {content?.btn}
         </Button>
       </div>
     </div>

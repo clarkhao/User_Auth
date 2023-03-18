@@ -16,17 +16,12 @@ function MyApp({ Component, pageProps }: AppProps) {
   const theme = useThemeStore((state) => state.theme);
 
   return (
-    <StrictMode>
-      <ThemeProvider theme={theme}>
-        <Head>
-          <meta
-            name="viewport"
-            content="width=device-width, initial-scale=1.0"
-          />
-        </Head>
-        <Component {...pageProps} />
-      </ThemeProvider>
-    </StrictMode>
+    <ThemeProvider theme={theme}>
+      <Head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      </Head>
+      <Component {...pageProps} />
+    </ThemeProvider>
   );
 }
 

@@ -18,24 +18,6 @@ export type TUser = {
   oauth: JsonValue | null
 }
 /**
- * Model Auth
- */
-export type TAuth = {
-  id: number
-  userId: string
-  token: string
-  createAt: Date
-}
-/**
- * Model Session
- */
-export type TSession = {
-  id: string
-  userId: string
-  createAt: Date
-  session: JsonValue
-}
-/**
  * Enums
  */
 export enum Role {
@@ -55,7 +37,28 @@ export type TUserType = keyof typeof UserType
 * User数据库返回类型
 */
 export type TUserInfo = Omit<TUser, 'salt' | 'hash'>;
-/** 
-* Github API Info返回类型，name即githubInfo.name, email即githubInfo.email
-*/
-export type TGithubUser = { name: string, email: string, githubInfo: JsonValue };
+export type TSession = {
+  id: string;
+  token?: string;
+  userInfo: JsonObject;
+  source?: string;
+  locale: string;
+  profile?: TUserProfile;
+  createAt?: string;
+};
+export type TInfo = {
+  name: string;
+  email: string;
+  role: string;
+}
+export type TProfile = {
+  name: string;
+  email: string;
+  role: string;
+  locale: string;
+  picture?: string;
+  bio?: string;
+  createAt: string;
+  lastModifiedAt: string;
+}
+export type TUserProfile = Partial<TProfile> & {id?:string};

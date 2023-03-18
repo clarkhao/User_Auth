@@ -74,11 +74,11 @@ class EmailUser extends User {
         case 
           when (select count(*) form exist_user) = 0
           then false
-          else (select id, salt, hash, role from exist_user)          
+          else (select id, email, salt, hash, role, profile from exist_user)          
         end as user;
       `, { isReturning: false, isTransaction: false }, [this.name, this.type, Role.Pending]) as Promise<{
       success: boolean;
-      query: { user: boolean | {id: string, salt: string, hash: string, role: Role} }[];
+      query: { user: boolean | {id: string, email: string, salt: string, hash: string, role: Role, profile: JsonValue} }[];
       error: Error | null;
     }>;
   }

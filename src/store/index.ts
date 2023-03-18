@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 import type {Theme} from '@mui/material/styles';
 import { lightTheme, darkTheme } from '../component/utils';
+import { boolean } from 'zod';
 /**
  * theme controle
  */
@@ -15,4 +16,17 @@ export const useThemeStore = create<IThemeStore>(set => ({
 }))
 /**
  * i18n control
+ * next.js中通过内置的router就可以控制locale，控制i18n，不需要在这里设置
  */
+
+/**
+ * login status
+ */
+interface ILoginStore {
+  login: boolean;
+  toggleLogin: (newLogin: boolean) => void;
+}
+export const useLoginStore = create<ILoginStore>(set => ({
+  login: false,
+  toggleLogin: (newLogin: boolean) => set({login: newLogin})
+}))

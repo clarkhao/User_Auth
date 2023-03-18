@@ -4,6 +4,7 @@ import type { NextRequest } from 'next/server';
 
 export function middleware(request: NextRequest) {
   const response = NextResponse.next();
+  const url = new URL(request.url);
   /** 
   * 部分优化
   */
@@ -11,9 +12,8 @@ export function middleware(request: NextRequest) {
   /** 
   * CORS
   */
-  response.headers.set('Access-Control-Allow-Origin', 'http://localhost:3000');
+  response.headers.set('Access-Control-Allow-Origin', url.origin);
   response.headers.set('Access-Control-Allow-Method', '*');
-  response.headers.set('Access-Control-Allow-Headers', 'Cookie');
   response.headers.set('Access-Control-Allow-Credentials', 'true');
   /** 
   * for security 除了swagger doc页面
@@ -37,7 +37,5 @@ export function middleware(request: NextRequest) {
       response.headers.set('Cache-Control', 'public, max-age=604800');
     }
   }
-  
-
   return response;
 }

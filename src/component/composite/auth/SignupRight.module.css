@@ -51,6 +51,9 @@
   align-items: stretch;
   row-gap: 15px;
 }
+.oauth a {
+  color: var(--signup-right-oauth-font-color);
+}
 @media screen and (max-width: 576px) {
   .container {
     height: 100vh;
