@@ -1,1 +1,1 @@
-export {verifySignup, signupSchema} from './auth';
+export { SignupSchema, SigninSchema } from "./auth";

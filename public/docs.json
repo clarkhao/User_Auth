@@ -1,328 +1,606 @@
 {
-    "openapi": "3.0.0",
-    "info": {
-        "title": "User-Auth with Next Swagger API",
-        "version": "1.0"
-    },
-    "servers": [
-        {
-            "url": "https://userauth.clarkhao.repl.co:443",
-            "description": "development mode url"
+  "openapi": "3.0.0",
+  "info": { "title": "User-Auth with Next Swagger API", "version": "1.0" },
+  "servers": [
+    { "url": "http://192.168.3.55:3000", "description": "development mode url" }
+  ],
+  "components": {
+    "responses": {
+      "BadRequest": {
+        "description": "400 Client side errors",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/SimpleMessage" }
+          }
         }
-    ],
-    "components": {
+      },
+      "FailedAuth": {
+        "description": "401 Authentication information is missing or invalid",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/SimpleMessage" }
+          }
+        }
+      },
+      "InvalidRole": {
+        "description": "403 not aurhorized",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/SimpleMessage" }
+          }
+        }
+      },
+      "NotFound": {
+        "description": "404 The user name or email not found or invalid",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/SimpleMessage" }
+          }
+        }
+      },
+      "NoSuchMethod": {
+        "description": "405 the request methods not allowd",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/SimpleMessage" }
+          }
+        }
+      },
+      "ConflictId": {
+        "description": "409 Already used user name or email",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/SimpleMessage" }
+          }
+        }
+      },
+      "ServerMistake": {
+        "description": "500 Server Inner Mistake",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/SimpleMessage" }
+          }
+        }
+      },
+      "UpstreamMistake": {
+        "description": "502 Upstream Server is temporarily not available",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/SimpleMessage" }
+          }
+        }
+      }
+    },
+    "schemas": {
+      "SimpleMessage": {
+        "type": "object",
+        "properties": { "msg": { "type": "string" } }
+      },
+      "Token": {
+        "type": "object",
+        "properties": {
+          "token": { "type": "string" },
+          "originalUrl": { "type": "string" },
+          "locale": { "type": "string" },
+          "userInfo": { "$ref": "#/components/schemas/UserInfo" },
+          "id": { "type": "string" }
+        }
+      },
+      "UserInfo": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string", "description": "user name" },
+          "email": { "type": "string", "description": "user email" },
+          "role": { "type": "string", "description": "pending, user or admin" }
+        }
+      },
+      "Encrypted": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "string",
+            "description": "data:publicEncrypted(key:iv) connected"
+          }
+        }
+      },
+      "Profile": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "description": "user id by db" },
+          "name": { "type": "string", "description": "user name" },
+          "email": { "type": "string", "description": "user email" },
+          "role": { "type": "string", "description": "pending, user or admin" },
+          "locale": { "type": "string" },
+          "picture": {
+            "type": "string",
+            "description": "user profile picture addr url"
+          },
+          "bio": { "type": "string" },
+          "createAt": { "type": "string" },
+          "lastModifiedAt": { "type": "string" }
+        }
+      }
+    },
+    "securitySchemes": {
+      "HttpOnlyCookie": { "type": "apiKey", "in": "cookie", "name": "token" },
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  },
+  "paths": {
+    "/api/hello": {
+      "get": {
+        "description": "do some test",
+        "responses": { "200": { "description": "some test" } }
+      }
+    },
+    "/api/v0/auth/oauth/github": {
+      "get": {
+        "description": "authentication with oauth github",
+        "summary": "只是参考不可测试",
+        "tags": ["oauth"],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "code",
+            "schema": { "type": "string" },
+            "description": "The code sent by Github which will be used for token fetch"
+          }
+        ],
         "responses": {
-            "BadRequest": {
-                "description": "400 Client side errors",
-                "content": {
-                    "application/json": {
-                        "schema": {
-                            "$ref": "#/components/schemas/SimpleMessage"
-                        }
-                    }
-                }
-            },
-            "FailedAuth": {
-                "description": "401 Authentication information is missing or invalid",
-                "content": {
-                    "application/json": {
-                        "schema": {
-                            "$ref": "#/components/schemas/SimpleMessage"
-                        }
-                    }
-                }
-            },
-            "InvalidPWD": {
-                "description": "403 not aurhorized",
-                "content": {
-                    "application/json": {
-                        "schema": {
-                            "$ref": "#/components/schemas/SimpleMessage"
-                        }
-                    }
-                }
-            },
-            "NotFound": {
-                "description": "404 The user name or email not found or invalid",
-                "content": {
-                    "application/json": {
-                        "schema": {
-                            "$ref": "#/components/schemas/SimpleMessage"
-                        }
-                    }
-                }
-            },
-            "ConflictId": {
-                "description": "409 Already used user name or email",
-                "content": {
-                    "application/json": {
-                        "schema": {
-                            "$ref": "#/components/schemas/SimpleMessage"
-                        }
-                    }
-                }
-            },
-            "ServerMistake": {
-                "description": "500 Server Inner Mistake",
-                "content": {
-                    "application/json": {
-                        "schema": {
-                            "$ref": "#/components/schemas/SimpleMessage"
-                        }
-                    }
-                }
-            }
-        },
-        "schemas": {
-            "SimpleMessage": {
-                "type": "object",
-                "properties": {
-                    "msg": {
-                        "type": "string"
-                    }
-                }
-            },
-            "User": {
-                "type": "object",
-                "properties": {
-                    "id": {
-                        "type": "integer",
-                        "description": "user id"
-                    },
-                    "name": {
-                        "type": "string",
-                        "description": "user name"
-                    },
-                    "email": {
-                        "type": "string",
-                        "description": "user email"
-                    },
-                    "photo": {
-                        "type": "string",
-                        "description": "user profile photo url"
-                    }
-                }
-            },
-            "Encrypted": {
-                "type": "object",
-                "properties": {
-                    "data": {
-                        "type": "string",
-                        "description": "data:publicEncrypted(key:iv) connected"
-                    }
-                }
-            }
-        },
-        "securitySchemes": {
-            "HttpOnlyCookie": {
-                "type": "apiKey",
-                "in": "cookie",
-                "name": "token"
-            },
-            "bearerAuth": {
-                "type": "http",
-                "scheme": "bearer",
-                "bearerFormat": "JWT"
-            },
-            "github_oauth": {
-                "type": "oauth2",
-                "description": "github oauth",
-                "flows": {
-                    "authorizationCode": {
-                        "authorizationUrl": "https://github.com/login/oauth/authorize",
-                        "tokenUrl": "https://github.com/login/oauth/access_token",
-                        "scope": {
-                            "read": "Grants read access to public information",
-                            "write": "Grants write access to public information",
-                            "admin": "Grants read and write access to administrative information"
-                        }
-                    }
-                }
-            }
+          "303": {
+            "description": "signin with oauth successfully, redirect to success page where request the token",
+            "headers": { "Set-Cookie": { "schema": { "type": "string" } } }
+          },
+          "405": {
+            "description": "method not allowed",
+            "$ref": "#/components/responses/NoSuchMethod"
+          },
+          "500": {
+            "description": "db or redis io mistake",
+            "$ref": "#/components/responses/ServerMistake"
+          },
+          "502": {
+            "description": "upstream server mistake",
+            "$ref": "#/components/responses/UpstreamMistake"
+          }
         }
+      }
     },
-    "paths": {
-        "/api/hello": {
-            "get": {
-                "description": "say hello",
-                "responses": {
-                    "200": {
-                        "description": "name"
-                    }
-                }
-            }
-        },
-        "/api/v0/auth": {},
-        "/api/v0/auth/oauth/github": {
-            "get": {
-                "description": "authentication with oauth github",
-                "paremeters": [
-                    {
-                        "in": "query",
-                        "name": "code",
-                        "schema": {
-                            "type": "string"
-                        },
-                        "description": "The code sent by Github which will be used for token fetch"
-                    }
-                ],
-                "responses": {
-                    "201": null,
-                    "500": null,
-                    "502": null
-                }
-            }
-        },
-        "/api/v0/auth/oauth/google": {
-            "get": {
-                "description": "authentication with oauth google",
-                "paremeters": [
-                    {
-                        "in": "query",
-                        "name": "code",
-                        "schema": {
-                            "type": "string"
-                        },
-                        "description": "The code sent by Google which will be used for token fetch"
-                    }
-                ],
-                "responses": {
-                    "201": null,
-                    "500": null,
-                    "502": null
-                }
-            }
-        },
-        "/api/v0/auth/signin": {
-            "post": {
-                "description": "email user try to login with email and pwd. if Match it will send 2 tokens, one is access token, another as refresh token inside a httponly cookie. then create session record in redis and backup in db.",
-                "requestBody": {
-                    "description": "user information post for signin",
-                    "content": {
-                        "application/x-www-form-urlencoded": {
-                            "schema": {
-                                "$ref": "#components/schemas/Encrypted"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "signin with correct name and password, send tokens",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/SimpleMessage",
-                                    "example": null
-                                }
-                            }
-                        }
-                    },
-                    "307": {
-                        "description": "登录后跳转至原地址"
-                    },
-                    "400": {
-                        "description": "others"
-                    },
-                    "401": {
-                        "description": "wrong password or name"
-                    },
-                    "500": {
-                        "description": "inner server mistake"
-                    }
-                }
-            },
-            "head": {
-                "description": "resend the email for comfirmation again",
-                "responses": {
-                    "204": null,
-                    "401": null,
-                    "429": null,
-                    "500": null,
-                    "503": null
-                }
-            },
-            "delete": {
-                "description": "user log out, delete access token, refresh token and session record in redis",
-                "responses": {
-                    "204": null,
-                    "302": null,
-                    "404": null,
-                    "500": null
-                }
-            }
-        },
-        "/api/v0/auth/signup": {
-            "post": {
-                "description": "sign up a new email user. if success, craete user with pending role in db and send a email confirmation with token inside url",
-                "requestBody": {
-                    "description": "user information post for signup",
-                    "content": {
-                        "application/x-www-form-urlencoded": {
-                            "schema": {
-                                "$ref": "#components/schemas/Encrypted"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "201": {
-                        "description": "craete user with pending role in db and send a email confirmation with token inside url",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/SimpleMessage",
-                                    "example": null
-                                }
-                            }
-                        }
-                    },
-                    "400": {
-                        "$ref": "#/components/responses/BadRequest"
-                    },
-                    "409": {
-                        "$ref": "#/components/responses/ConflictId"
-                    },
-                    "500": {
-                        "$ref": "#/components/responses/ServerMistake"
-                    }
-                }
-            },
-            "get": {
-                "description": "click the email link and get here.then validate the token inside the email link. if success, update the role from pending to user and redirect to login",
-                "parameters": [
-                    {
-                        "in": "query",
-                        "name": "token",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "responses": {
-                    "307": {
-                        "description": "verify the token successfully",
-                        "headers": {
-                            "location": {
-                                "schema": {
-                                    "type": "string"
-                                },
-                                "description": "the login url"
-                            }
-                        }
-                    },
-                    "400": {
-                        "$ref": "#/components/responses/BadRequest"
-                    },
-                    "404": {
-                        "$ref": "#/components/responses/NotFound"
-                    },
-                    "500": {
-                        "$ref": "#/components/responses/ServerMistake"
-                    }
-                }
-            }
+    "/api/v0/auth/oauth/google": {
+      "get": {
+        "description": "authentication with oauth google",
+        "summary": "只是参考不可测试",
+        "tags": ["oauth"],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "code",
+            "schema": { "type": "string" },
+            "description": "The code sent by Google which will be used for token fetch"
+          }
+        ],
+        "responses": {
+          "303": {
+            "description": "signin with oauth successfully, redirect to success page where request the token",
+            "headers": { "Set-Cookie": { "schema": { "type": "string" } } }
+          },
+          "405": {
+            "description": "method not allowed",
+            "$ref": "#/components/responses/NoSuchMethod"
+          },
+          "500": {
+            "description": "db or redis io mistake",
+            "$ref": "#/components/responses/ServerMistake"
+          },
+          "502": {
+            "description": "upstream server mistake",
+            "$ref": "#/components/responses/UpstreamMistake"
+          }
         }
+      }
     },
-    "tags": []
+    "/api/v0/auth/oauth": {
+      "get": {
+        "description": "after oauth 2.0 signed in successfully, apply for access token and user info",
+        "summary": "只是参考不可测试",
+        "tags": ["oauth"],
+        "parameters": [
+          {
+            "in": "cookie",
+            "name": "token",
+            "schema": { "type": "string" },
+            "required": true
+          }
+        ],
+        "security": [{ "HttpOnlyCookie": [] }],
+        "responses": {
+          "200": {
+            "description": "get access token and user info",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Token",
+                  "example": null
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "token in cookie missing",
+            "$ref": "#/components/responses/FailedAuth"
+          },
+          "500": {
+            "description": "redis or inner server mistake",
+            "$ref": "#/components/responses/ServerMistake"
+          }
+        }
+      }
+    },
+    "/api/v0/auth/signin": {
+      "get": {
+        "description": "oauth signin from here",
+        "summary": "只是参考不可测试",
+        "tags": ["oauth"],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "oauth",
+            "schema": { "type": "string" },
+            "required": true,
+            "description": "indicate which oauth github / google"
+          },
+          {
+            "in": "query",
+            "name": "locale",
+            "schema": { "type": "string" },
+            "description": "indicate locale"
+          }
+        ],
+        "responses": {
+          "307": {
+            "description": "record the url from which make the request and the locale in cookies, and then redirect to oauth url",
+            "headers": {
+              "set-cookie": {
+                "schema": { "type": "string" },
+                "description": "original url and locale cookies"
+              }
+            }
+          },
+          "400": {
+            "description": "oauth parameters inside query string missing",
+            "$ref": "#/components/responses/BadRequest"
+          }
+        }
+      },
+      "post": {
+        "description": "email user try to login with email and pwd. if Match it will send 2 tokens, one is access token, another as refresh token inside a httponly cookie. then create session record in redis and backup in db.",
+        "tags": ["auth"],
+        "requestBody": {
+          "description": "user information post for signin",
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": { "$ref": "#components/schemas/Encrypted" }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "in": "query",
+            "name": "locale",
+            "schema": { "type": "string" },
+            "description": "indicate locale"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "signin with correct name and password, send tokens",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Token",
+                  "example": null
+                }
+              }
+            }
+          },
+          "307": {
+            "description": "登录后跳转至原地址",
+            "headers": { "Location": { "schema": { "type": "string" } } }
+          },
+          "400": {
+            "description": "errors from user input data verified or parameters missing",
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "description": "wrong password or user name",
+            "$ref": "#/components/responses/FailedAuth"
+          },
+          "500": {
+            "description": "inner server mistake",
+            "$ref": "#/components/responses/ServerMistake"
+          }
+        }
+      },
+      "head": {
+        "description": "resend the email for comfirmation again, both authen + author needed",
+        "tags": ["auth"],
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "204": { "description": "apply successfully" },
+          "401": {
+            "description": "authentication failed",
+            "$ref": "#/components/responses/FailedAuth"
+          },
+          "403": {
+            "description": "not pending any more",
+            "$ref": "#/components/responses/InvalidRole"
+          },
+          "429": { "description": "too many requests" },
+          "500": {
+            "description": "inner server mistake",
+            "$ref": "#/components/responses/ServerMistake"
+          }
+        }
+      },
+      "delete": {
+        "description": "user log out, delete access token, refresh token and session record in redis, authen needed",
+        "tags": ["auth"],
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "204": { "description": "successfull log out" },
+          "500": {
+            "description": "inner server mistake",
+            "$ref": "#/components/responses/ServerMistake"
+          }
+        }
+      }
+    },
+    "/api/v0/auth/signup": {
+      "post": {
+        "description": "sign up a new email user. if success, craete user with pending role in db and send a email confirmation with token inside url",
+        "tags": ["auth"],
+        "requestBody": {
+          "description": "user information post for signup",
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": { "$ref": "#components/schemas/Encrypted" }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "in": "query",
+            "name": "locale",
+            "schema": { "type": "string" },
+            "description": "indicate locale"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "craete user with pending role in db and send a email confirmation with token inside url",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SimpleMessage",
+                  "example": null
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "mistake from request body or missing parameters",
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "409": {
+            "description": "repeated name / email",
+            "$ref": "#/components/responses/ConflictId"
+          },
+          "500": {
+            "description": "db i/o error or server mistake",
+            "$ref": "#/components/responses/ServerMistake"
+          }
+        }
+      },
+      "get": {
+        "description": "click the email link and get here.then validate the token inside the email link. if success, update the role from pending to user and redirect to login",
+        "tags": ["auth"],
+        "parameters": [
+          { "in": "query", "name": "token", "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "301": {
+            "description": "the email had been invalid, send a new email instead"
+          },
+          "307": {
+            "description": "verify the token successfully",
+            "headers": {
+              "location": {
+                "schema": { "type": "string" },
+                "description": "the login url"
+              }
+            }
+          },
+          "400": {
+            "description": "invalid url inside email",
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "500": {
+            "description": "inner server mistake",
+            "$ref": "#/components/responses/ServerMistake"
+          }
+        }
+      }
+    },
+    "/api/v0/user/{id}": {
+      "parameters": [
+        {
+          "in": "path",
+          "name": "id",
+          "schema": { "type": "string" },
+          "description": "user id"
+        }
+      ],
+      "get": {
+        "description": "get a user info by id, need authen + author",
+        "tags": ["user"],
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Profile",
+                  "example": null
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "parameter missing",
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "description": "authentication failed",
+            "$ref": "#/components/responses/FailedAuth"
+          },
+          "403": {
+            "description": "role is pending not user",
+            "$ref": "#/components/responses/InvalidRole"
+          },
+          "500": { "$ref": "#/components/responses/ServerMistake" }
+        }
+      },
+      "post": {
+        "description": "update use's info, both authen + author needed",
+        "tags": ["user"],
+        "requestBody": {
+          "description": "user information post",
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": { "$ref": "#components/schemas/Encrypted" }
+            }
+          }
+        },
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "204": { "description": "updated successfully" },
+          "400": {
+            "description": "parameter missing or input data error",
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "description": "authentication failed",
+            "$ref": "#/components/responses/FailedAuth"
+          },
+          "403": {
+            "description": "not authorized",
+            "$ref": "#/components/responses/InvalidRole"
+          },
+          "409": {
+            "description": "repeated info",
+            "$ref": "#/components/responses/ConflictId"
+          },
+          "500": { "$ref": "#/components/responses/ServerMistake" }
+        }
+      },
+      "delete": {
+        "description": "delete a user by id, authen needed",
+        "tags": ["user"],
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "204": { "description": "deleted successfully" },
+          "401": {
+            "description": "authentication failed",
+            "$ref": "#/components/responses/FailedAuth"
+          },
+          "500": { "$ref": "#/components/responses/ServerMistake" }
+        }
+      }
+    },
+    "/api/v0/user": {
+      "get": {
+        "description": "as Admin role get a list of users, first check in redis cache, if not then request in the db",
+        "tags": ["users"],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "index",
+            "schema": { "type": "integer" },
+            "required": true,
+            "description": "index number for pagination"
+          },
+          {
+            "in": "query",
+            "name": "sort",
+            "schema": { "type": "string" },
+            "description": "sorting by xxx"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Profile",
+                    "example": null
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "parameter missing",
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "description": "authentication failed",
+            "$ref": "#/components/responses/FailedAuth"
+          },
+          "403": {
+            "description": "role is pending not user",
+            "$ref": "#/components/responses/InvalidRole"
+          },
+          "500": { "$ref": "#/components/responses/ServerMistake" }
+        }
+      },
+      "delete": {
+        "description": "as Admin role delete list of users",
+        "tags": ["users"],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "id",
+            "schema": { "type": "array", "items": { "type": "string" } },
+            "required": true,
+            "description": "array of user ids"
+          }
+        ],
+        "responses": {
+          "204": { "description": "deleted successfully" },
+          "400": {
+            "description": "parameter missing",
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "description": "authentication failed",
+            "$ref": "#/components/responses/FailedAuth"
+          },
+          "403": {
+            "description": "role is pending not user",
+            "$ref": "#/components/responses/InvalidRole"
+          },
+          "500": { "$ref": "#/components/responses/ServerMistake" }
+        }
+      }
+    }
+  },
+  "tags": []
 }

@@ -20,10 +20,10 @@ export type JsonValue = string | number | boolean | JsonObject | JsonArray | nul
 export type JsonObject = { [Key in string]?: JsonValue }
 export interface JsonArray extends Array<JsonValue> { }
 
-export type SideSignup = {
+export type SideSign = {
     [key: string]: string;
 }
 export type Signup = {
-    "left": SideSignup;
-    "right": SideSignup;
+    "left": SideSign;
+    "right": SideSign;
 }

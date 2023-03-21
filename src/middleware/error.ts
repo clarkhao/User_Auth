@@ -21,7 +21,7 @@ const ErrorMiddleware = (err: unknown, res: NextApiResponse) => {
     }
   } catch (error) {
     debug.error(error);
-    res.status(500).json({ msg: 'inner server mistake' });
+    //res.status(500).json({ msg: 'inner server mistake' });
   }
 }
 

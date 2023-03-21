@@ -1,65 +1,85 @@
-/** 
-* 描述400以上的响应
-*/
+/**
+ * 描述400以上的响应
+ */
 export const responses = {
   BadRequest: {
-    description: '400 Client side errors',
+    description: "400 Client side errors",
     content: {
-      'application/json': {
+      "application/json": {
         schema: {
-          '$ref': '#/components/schemas/SimpleMessage'
-        }
-      }
-    }
+          $ref: "#/components/schemas/SimpleMessage",
+        },
+      },
+    },
   },
   FailedAuth: {
-    description: '401 Authentication information is missing or invalid',
+    description: "401 Authentication information is missing or invalid",
     content: {
-      'application/json': {
+      "application/json": {
         schema: {
-          '$ref': '#/components/schemas/SimpleMessage'
-        }
-      }
-    }
+          $ref: "#/components/schemas/SimpleMessage",
+        },
+      },
+    },
   },
-  InvalidPWD: {
-    description: '403 not aurhorized',
+  InvalidRole: {
+    description: "403 not aurhorized",
     content: {
-      'application/json': {
+      "application/json": {
         schema: {
-          '$ref': '#/components/schemas/SimpleMessage'
-        }
-      }
-    }
+          $ref: "#/components/schemas/SimpleMessage",
+        },
+      },
+    },
   },
   NotFound: {
-    description: '404 The user name or email not found or invalid',
+    description: "404 The user name or email not found or invalid",
     content: {
-      'application/json': {
+      "application/json": {
         schema: {
-          '$ref': '#/components/schemas/SimpleMessage'
-        }
-      }
-    }
+          $ref: "#/components/schemas/SimpleMessage",
+        },
+      },
+    },
+  },
+  NoSuchMethod: {
+    description: "405 the request methods not allowd",
+    content: {
+      "application/json": {
+        schema: {
+          $ref: "#/components/schemas/SimpleMessage",
+        },
+      },
+    },
   },
   ConflictId: {
-    description: '409 Already used user name or email',
+    description: "409 Already used user name or email",
     content: {
-      'application/json': {
+      "application/json": {
         schema: {
-          '$ref': '#/components/schemas/SimpleMessage'
-        }
-      }
-    }
+          $ref: "#/components/schemas/SimpleMessage",
+        },
+      },
+    },
   },
   ServerMistake: {
-    description: '500 Server Inner Mistake',
+    description: "500 Server Inner Mistake",
     content: {
-      'application/json': {
+      "application/json": {
         schema: {
-          '$ref': '#/components/schemas/SimpleMessage'
-        }
-      }
-    }
-  }
-}
+          $ref: "#/components/schemas/SimpleMessage",
+        },
+      },
+    },
+  },
+  UpstreamMistake: {
+    description: "502 Upstream Server is temporarily not available",
+    content: {
+      "application/json": {
+        schema: {
+          $ref: "#/components/schemas/SimpleMessage",
+        },
+      },
+    },
+  },
+};

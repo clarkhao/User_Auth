@@ -16,24 +16,31 @@ import { debug } from "src/utils";
  * /api/v0/auth/oauth/google:
  *   get:
  *     description: authentication with oauth google
- *     paremeters:
+ *     summary: 只是参考不可测试
+ *     tags:
+ *       - oauth
+ *     parameters:
  *       - in: query
  *         name: code
  *         schema:
  *           type: string
  *         description: The code sent by Google which will be used for token fetch
  *     responses:
- *       201:
- *         description: signin with oauth successfully, send tokens
- *         content:
- *           application/json:
+ *       303:
+ *         description: signin with oauth successfully, redirect to success page where request the token
+ *         headers: 
+ *           Set-Cookie:
  *             schema:
- *               $ref: '#/components/schemas/Token'
- *               example:
+ *               type: string
+ *       405:
+ *         description: method not allowed
+ *         $ref: '#/components/responses/NoSuchMethod'
  *       500:
- *         description inner server mistake due to db or redis i/o or others
+ *         description: db or redis io mistake
+ *         $ref: '#/components/responses/ServerMistake'
  *       502:
- *         description: upstream mistake
+ *         description: upstream server mistake
+ *         $ref: '#/components/responses/UpstreamMistake'
  */
 async function googleOauthHandler(req: NextApiRequest, res: NextApiResponse) {
   try {

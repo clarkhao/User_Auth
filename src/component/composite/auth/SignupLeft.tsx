@@ -9,7 +9,7 @@ import { css } from "@emotion/react";
 //组件
 import Mark from "../../ui/MarkUI";
 //type
-import {SideSignup} from '../../utils';
+import {SideSign} from '../../utils';
 
 type TSignupLeft = {
   /**
@@ -19,7 +19,7 @@ type TSignupLeft = {
   /**
    * i18n data
    */
-  i18n?: SideSignup;
+  i18n?: SideSign;
 };
 
 function SignupLeft({ src, i18n, ...props }: TSignupLeft) {
@@ -40,8 +40,8 @@ function SignupLeft({ src, i18n, ...props }: TSignupLeft) {
     >
       <div>
         <Mark size={50} />
-        <h2>{i18n?.title}</h2>
-        <p>{i18n?.paragraph}</p>
+        <h2>{i18n?.title ?? '与全球宠物爱好者连接'}</h2>
+        <p>{i18n?.paragraph ?? '探索宠物生活的乐趣，与全球宠物爱好者分享你的独特故事。在这里，你可以和宠物一起享受美好的生活，还可以发现各种关于宠物的好玩、有趣的事情。'}</p>
       </div>
       <div className={style.animate}>
         <Player

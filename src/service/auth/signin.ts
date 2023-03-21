@@ -1,7 +1,6 @@
 import {
   SigninNameSchema,
   db,
-  redisUpClient,
   generateToken,
   debug,
   setRedis,
@@ -38,24 +37,24 @@ const isMatchUser = async (data: SignIn) => {
     if (error !== null) {
       throw error;
     }
-    if (typeof query[0].user === "boolean") {
-      throw new Error(`400 wrong user name`);
+    if (query[0] === undefined) {
+      throw new Error(`401 wrong user name`);
     } else {
       const hash = crypto
-        .pbkdf2Sync(data.password, query[0].user.salt, 1000, 64, `sha512`)
+        .pbkdf2Sync(data.password, query[0].salt, 1000, 64, `sha512`)
         .toString(`hex`);
       return {
-        isMatched: hash === query[0].user.hash,
-        pending: query[0].user.role === Role.Pending,
-        isAdmin: query[0].user.role === Role.Admin,
-        id: query[0].user.id,
-        email: query[0].user.email,
+        isMatched: hash === query[0].hash,
+        pending: query[0].role === Role.Pending,
+        isAdmin: query[0].role === Role.Admin,
+        id: query[0].id,
+        email: query[0].email,
         name: data.name,
-        rawProfile: query[0].user.profile,
+        rawProfile: query[0].profile,
       };
     }
   } catch (err) {
-    throw new Error(`500 from service/auth/signin mistake`);
+    throw err;
   }
 };
 /**
@@ -93,11 +92,7 @@ const saveSession = async ({
     return { success, accessToken };
   } catch (err) {
     debug.error(`from service/oauth/index: ${err}`);
-    if (err instanceof Error) {
-      throw err;
-    } else {
-      throw new Error(`${err}`);
-    }
+    throw err;
   }
 };
 export { verifySigninData, isMatchUser, saveSession };

@@ -13,7 +13,7 @@ import LeftRight from "src/component/layout/LeftRight";
 import { useRouter } from "next/router";
 import ThemeI18n from "src/component/composite/ThemeI18n";
 //type
-import type { SideSignup, Signup } from "src/component/utils";
+import type { SideSign, Signup } from "src/component/utils";
 
 interface SignupProps {
   i18n: Signup;

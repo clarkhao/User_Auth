@@ -3,8 +3,21 @@ const config = require("config");
 import { debug } from "../logger";
 import { TSession } from "src/model/type";
 
-const redisUpClient = new Redis(
-  process.env[config.get("redis.upurl")] as string
+const redisUpClient = new Redis({
+  port: parseInt(process.env.REDIS_UP_PORT as string),
+  host: process.env.REDIS_UP_HOST,
+  username: process.env.REDIS_USERNAME,
+  password: process.env.REDIS_UP_PASSWORD,
+  tls: {},
+  retryStrategy(times) {
+    if (times > 2) return null; // return null to stop retrying
+    return Math.min(times * 500, 2000);
+  },
+});
+//redisUpClient.on("connect", () => console.log(`connected`));
+redisUpClient.on("disconnect", () => console.log("disconnected"));
+redisUpClient.on("error", (error) =>
+  console.warn("got an error from redis", error)
 );
 
 const setRedis = async (key: string, obj: any) => {
@@ -13,26 +26,27 @@ const setRedis = async (key: string, obj: any) => {
     const objStrBase64 = Buffer.from(objStr).toString("base64");
     //return "OK" if saved objStr
     const save = await redisUpClient.set(key, objStr);
-    return { success: save === "OK" };
+    const success = save === "OK";
+    return { success };
   } catch (err) {
     debug.error(`from utils/redis/index: ${err}`);
-    if (err instanceof Error) {
-      throw err;
-    } else {
-      throw new Error("cannot write into up redis");
-    }
+    redisUpClient.disconnect();
+    throw err;
   }
 };
 const getRedis = async (key: string) => {
   try {
     //return "OK" if saved objStr
     const str = (await redisUpClient.get(key)) as string | null;
-    if(str === null)
-      throw new Error('key not exited');
-    const data = JSON.parse(str);
-    return { data, error: null };
+    console.log(str);
+    if (str === null) return { data: null, error: new Error("key not exited") };
+    else {
+      const data = JSON.parse(str as string);
+      return { data, error: null };
+    }
   } catch (err) {
     debug.error(`from utils/redis/index: ${err}`);
+    redisUpClient.disconnect();
     return { data: null, error: err };
   }
 };
@@ -42,7 +56,9 @@ const delRedis = async (key: string) => {
     console.log(`deleted redis ${del}`);
   } catch (err) {
     debug.error(`from utils/redis/index: ${err}`);
+    redisUpClient.disconnect();
+    throw err;
   }
 };
 
-export { redisUpClient, setRedis, getRedis, delRedis };
+export { setRedis, getRedis, delRedis };

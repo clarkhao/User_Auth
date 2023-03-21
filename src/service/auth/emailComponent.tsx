@@ -1,4 +1,7 @@
-import React, {lazy} from "react";
+import React, { lazy, Suspense } from "react";
+import SignupEmailCN from "../../../public/locales/cn/signupEmail.mdx";
+import SignupEmailEN from "../../../public/locales/en/signupEmail.mdx";
+import SignupEmailJP from "../../../public/locales/jp/signupEmail.mdx";
 
 type TEmailTemplate = {
   /**
@@ -6,18 +9,27 @@ type TEmailTemplate = {
    */
   url: string;
   /**
-   * locale 
+   * locale
    */
   locale: string;
 };
 
-function EmailTemplate({ url,locale, ...props }: TEmailTemplate) {
-  const SignupEmail = lazy(() => import(`../../../public/locales/${locale}/signupEmail.mdx`));
+function EmailTemplate({ url, locale }: TEmailTemplate) {
   return (
     <>
-      <div>
-        <SignupEmail components={{UrlComponent: () => <a href={url}>{url}</a>}}/>
-      </div>
+      {locale === "cn" ? (
+        <SignupEmailCN
+          components={{ UrlComponent: () => <a href={url}>{url}</a> }}
+        />
+      ) : locale === "en" ? (
+        <SignupEmailEN
+          components={{ UrlComponent: () => <a href={url}>{url}</a> }}
+        />
+      ) : (
+        <SignupEmailJP
+          components={{ UrlComponent: () => <a href={url}>{url}</a> }}
+        />
+      )}
     </>
   );
 }
