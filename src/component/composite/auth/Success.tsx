@@ -23,11 +23,11 @@ function Success({ content,isSignup, ...props }: TSuccess) {
   return (
     <div className={style.container}>
       <Complete size="180px" />
-      <h3>{content?.title}</h3>
+      <h3>{content?.title ?? '注册成功'}</h3>
       <div className={style.content}>
-        <div>{content?.guideline}</div>
+        <div>{content?.guideline ?? '现在可以登陆您的账户'}</div>
         <Button variant="contained" color="success">
-          {content?.btn}
+          {content?.btn ?? '登陆'}
         </Button>
       </div>
     </div>

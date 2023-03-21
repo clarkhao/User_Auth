@@ -17,7 +17,7 @@ import type { TUserType } from "src/model/type";
  * if only access token expires, generate new access token and send it back to client
  */
 const AuthMiddleware = async (req: NextApiRequest, res: NextApiResponse) => {
-  const aToken = req.headers["Authorization"] as string;
+  const aToken = (req.headers["authorization"] as string).split(' ')[1];
   const aTokenVerified = verifyToken(
     aToken,
     process.env[config.get("key.access")] as string
@@ -26,7 +26,9 @@ const AuthMiddleware = async (req: NextApiRequest, res: NextApiResponse) => {
   else {
     //access token invalid, now fetch the refresh token / oauth token inside redis
     const { data, error } = await getRedis(aToken);
-    if (error !== null) res.status(401).json({ msg: "invalid token" });
+    if (error !== null) {
+      throw new Error(`401 invalid token`);
+    }
     const { token, source } = data as TSession;
     switch (source) {
       case "email":
@@ -34,10 +36,13 @@ const AuthMiddleware = async (req: NextApiRequest, res: NextApiResponse) => {
           token as string,
           process.env[config.get("key.refresh")] as string
         );
-        if (refreshVerified instanceof Error)
-          res.status(401).json({ msg: "invalid token" });
+        if (refreshVerified instanceof Error) {
+          throw new Error(`401 invalid token`);
+        }
         const { success, accessToken } = await saveSession({ ...data });
-        if (!success) throw new Error(`500 redis not saved`);
+        if (!success) {
+          throw new Error(`500 redis not saved`);
+        }
         await delRedis(aToken);
         return accessToken;
       default:
@@ -45,8 +50,9 @@ const AuthMiddleware = async (req: NextApiRequest, res: NextApiResponse) => {
           token as string,
           source as string
         );
-        if (info instanceof Error)
-          res.status(401).json({ msg: "invalid token" });
+        if (info instanceof Error) {
+          throw new Error(`401 invalid token`);
+        }
         const { id } = await createOauthUser(
           info,
           UserType[
@@ -58,7 +64,7 @@ const AuthMiddleware = async (req: NextApiRequest, res: NextApiResponse) => {
         const result = await saveSession({ ...data, id });
         if (!result.success) throw new Error(`500 redis not saved`);
         await delRedis(aToken);
-        return accessToken;
+        return result.accessToken;
     }
   }
 };

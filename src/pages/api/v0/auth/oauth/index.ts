@@ -9,11 +9,32 @@ import { TSession } from "src/model/type";
  * @swagger
  * /api/v0/auth/oauth:
  *   get:
- *     description: use httponly access token to get the bearer token,
- *     in case for frontend to store token inside localStorage;
- *     the info frontend will get are {accessToken, originalUrl}
- *     originalUrl方便前端跳转到登陆前发起页面,
- *     authen needed, it is a httponly cookie token
+ *     description: after oauth 2.0 signed in successfully, apply for access token and user info
+ *     summary: 只是参考不可测试
+ *     tags:
+ *       - oauth
+ *     parameters:
+ *       - in: cookie
+ *         name: token
+ *         schema:
+ *           type: string
+ *         required: true
+ *     security:
+ *       - HttpOnlyCookie: []
+ *     responses:
+ *       200:
+ *         description: get access token and user info
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Token'
+ *               example:
+ *       401:
+ *         description: token in cookie missing
+ *         $ref: '#/components/responses/FailedAuth'
+ *       500:
+ *         description: redis or inner server mistake
+ *         $ref: '#/components/responses/ServerMistake'
  */
 
 async function RefreshOauthHandler(req: NextApiRequest, res: NextApiResponse) {
@@ -29,15 +50,13 @@ async function RefreshOauthHandler(req: NextApiRequest, res: NextApiResponse) {
       if (result.error !== null) throw new Error(`500 cannot read reids`);
       console.log(result.data);
       const { id, userInfo, locale } = result.data as TSession;
-      res
-        .status(200)
-        .json({
-          token: cookie,
-          originalUrl: originalUrl.cookie || "/",
-          locale,
-          userInfo,
-          id
-        });
+      res.status(200).json({
+        token: cookie,
+        originalUrl: originalUrl.cookie || "/",
+        locale,
+        userInfo,
+        id,
+      });
     }
   } catch (err) {
     ErrorMiddleware(err, res);

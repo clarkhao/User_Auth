@@ -18,6 +18,8 @@ const config = require("config");
  * /api/v0/auth/signup:
  *   post:
  *     description: sign up a new email user. if success, craete user with pending role in db and send a email confirmation with token inside url
+ *     tags:
+ *       - auth
  *     requestBody:
  *       description: user information post for signup
  *       content:
@@ -26,10 +28,10 @@ const config = require("config");
  *             $ref: '#components/schemas/Encrypted'
  *     parameters:
  *       - in: query
- *           name: locale
- *           schema:
- *             type: string
- *           description: indicate locale
+ *         name: locale
+ *         schema:
+ *           type: string
+ *         description: indicate locale
  *     responses:
  *       201:
  *         description: craete user with pending role in db and send a email confirmation with token inside url
@@ -39,19 +41,26 @@ const config = require("config");
  *               $ref: '#/components/schemas/SimpleMessage'
  *               example:
  *       400:
+ *         description: mistake from request body or missing parameters
  *         $ref: '#/components/responses/BadRequest'
  *       409:
+ *         description: repeated name / email
  *         $ref: '#/components/responses/ConflictId'
  *       500:
+ *         description: db i/o error or server mistake
  *         $ref: '#/components/responses/ServerMistake'
  *   get:
  *     description: click the email link and get here.then validate the token inside the email link. if success, update the role from pending to user and redirect to login
+ *     tags:
+ *       - auth
  *     parameters:
  *       - in: query
  *         name: token
  *         schema:
  *           type: string
  *     responses:
+ *       301:
+ *         description: the email had been invalid, send a new email instead
  *       307:
  *         description: verify the token successfully
  *         headers:
@@ -60,10 +69,10 @@ const config = require("config");
  *               type: string
  *             description: the login url
  *       400:
+ *         description: invalid url inside email
  *         $ref: '#/components/responses/BadRequest'
- *       404:
- *         $ref: '#/components/responses/NotFound'
  *       500:
+ *         description: inner server mistake
  *         $ref: '#/components/responses/ServerMistake'
  *
  */
@@ -71,9 +80,11 @@ const config = require("config");
 async function SignUpHandler(req: NextApiRequest, res: NextApiResponse) {
   try {
     LoggerMiddleware(req, res);
-    const locale = req.query['locale'] as string;
+    const locale = req.query["locale"] as string;
     switch (req.method) {
       case "POST":
+        if (locale === undefined || !["cn", "en", "jp"].includes(locale))
+          res.status(400).json({ msg: "oauth query string missing" });
         //decrypt req.body
         const { data, error } = DecryptMiddleware(req);
         if (error !== null) {
@@ -90,7 +101,7 @@ async function SignUpHandler(req: NextApiRequest, res: NextApiResponse) {
             return;
           } else {
             //send email for confirmation
-            sendEmailWithToken(token, signupData.email, locale || 'cn');
+            sendEmailWithToken(token, signupData.email, locale || "cn");
           }
         });
         //response
@@ -108,7 +119,7 @@ async function SignUpHandler(req: NextApiRequest, res: NextApiResponse) {
             if (token instanceof Error) {
               return;
             } else {
-              sendEmailWithToken(token, signupData.email, locale || 'cn');
+              sendEmailWithToken(token, signupData.email, locale || "cn");
             }
           });
           res.status(301).end();
@@ -118,11 +129,14 @@ async function SignUpHandler(req: NextApiRequest, res: NextApiResponse) {
         //else redirect to login page with status code 307
         //update the user
         const update = await checkUserRole(userId);
-        if (update) {
+        if(update instanceof Error) {
+          res.status(204).end();
+        } else if (update) {
           res.setHeader(
             "location",
-            `${config.get("server.host").concat("/v0/auth/login")}`
+            `${(process.env.NEXT_PUBLIC_ORIGIN as string).concat("/v0/auth/profile")}`
           );
+          //获取token
           res.status(307).end();
         } else {
           debug.error({ err: "failed to update role from pending to user" });

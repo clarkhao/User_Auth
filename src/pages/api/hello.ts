@@ -1,26 +1,21 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
-import type { NextApiRequest, NextApiResponse } from 'next'
-import { redisDownClient } from 'src/utils';
+import type { NextApiRequest, NextApiResponse } from "next";
+import { getRedis } from "src/utils";
 
-type Data = {
-  msg: string
-}
-/** 
-* @swagger
-* /api/hello:
-*   get:
-*     description: say hello
-*     responses:
-*       200:
-*         description: name
-*           
-*/
-async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse<Data>
-) {
-  const value = await redisDownClient.get('foo');
-  res.json({ msg: value ?? 'value is null' });
+/**
+ * @swagger
+ * /api/hello:
+ *   get:
+ *     description: do some test
+ *     responses:
+ *       200:
+ *         description: some test
+ *
+ */
+async function handler(req: NextApiRequest, res: NextApiResponse) {
+  const { data, error } = await getRedis("foo");
+  if (error !== null) res.send(error);
+  else res.json({ data });
 }
 
 export default handler;

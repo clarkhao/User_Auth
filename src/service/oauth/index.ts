@@ -1,4 +1,4 @@
-import { generateToken, setRedis, redisUpClient, debug, db } from "../../utils";
+import { generateToken, setRedis, debug, db } from "../../utils";
 import { JsonObject, JsonValue, UserType } from "../../model/type";
 import { OauthUser } from "../../model";
 const config = require("config");

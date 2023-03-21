@@ -29,7 +29,7 @@ export function middleware(request: NextRequest) {
     /** 
     * auth api不设缓存
     */
-    if (request.nextUrl.pathname.startsWith('/api/v0/auth')) {
+    if (request.nextUrl.pathname.startsWith('/api/v0/user')) {
       response.headers.set('Cache-Control', 'no-cache, no-store, must-revalidate');
       response.headers.set('Pragma', 'no-cache');
       response.headers.set('Expires', '-1');

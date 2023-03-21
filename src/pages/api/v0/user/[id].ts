@@ -11,25 +11,88 @@ import { saveSession } from "src/service";
 /**
  * @swagger
  * /api/v0/user/{id}:
+ *   parameters:
+ *     - in: path
+ *       name: id
+ *       schema:
+ *         type: string
+ *       description: user id
  *   get:
  *     description: get a user info by id, need authen + author
- *     parameters:
- *       - in: path
- *           name: id
- *           schema:
- *             type: string
- *           description: user id
+ *     tags:
+ *       - user
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: OK
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Profile'
+ *               example:
+ *       400:
+ *         description: parameter missing
+ *         $ref: '#/components/responses/BadRequest'
+ *       401:
+ *         description: authentication failed
+ *         $ref: '#/components/responses/FailedAuth'
+ *       403:
+ *         description: role is pending not user
+ *         $ref: '#/components/responses/InvalidRole'
+ *       500:
+ *         $ref: '#/components/responses/ServerMistake'
  *   post:
  *     description: update use's info, both authen + author needed
+ *     tags:
+ *       - user
+ *     requestBody:
+ *       description: user information post
+ *       content:
+ *         application/x-www-form-urlencoded:
+ *           schema:
+ *             $ref: '#components/schemas/Encrypted'
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       204:
+ *         description: updated successfully
+ *       400:
+ *         description: parameter missing or input data error
+ *         $ref: '#/components/responses/BadRequest'
+ *       401:
+ *         description: authentication failed
+ *         $ref: '#/components/responses/FailedAuth'
+ *       403:
+ *         description: not authorized
+ *         $ref: '#/components/responses/InvalidRole'
+ *       409:
+ *         description: repeated info
+ *         $ref: '#/components/responses/ConflictId'
+ *       500:
+ *         $ref: '#/components/responses/ServerMistake'
  *   delete:
- *     description: delete a user by id, both authen + author needed
- *
+ *     description: delete a user by id, authen needed
+ *     tags:
+ *       - user
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       204:
+ *         description: deleted successfully
+ *       401:
+ *         description: authentication failed
+ *         $ref: '#/components/responses/FailedAuth'
+ *       500:
+ *         $ref: '#/components/responses/ServerMistake'
  */
 
 async function SingleUserHandler(req: NextApiRequest, res: NextApiResponse) {
   try {
     LoggerMiddleware(req, res);
     const { id } = req.query;
+    console.log(id);
+    if(id === undefined) throw new Error(`400 parameter id missing`)
     const accessToken = await AuthMiddleware(req, res);
     if (req.method === "GET") {
       //first read session.profile and info
@@ -70,8 +133,8 @@ async function SingleUserHandler(req: NextApiRequest, res: NextApiResponse) {
           accessToken,
           userInfo: info,
           profile: userInfo,
-          source: 'email',
-          locale: 'cn'
+          source: "email",
+          locale: "cn",
         });
       }
       res.status(200).json({ profile: { ...userProfile } });
@@ -81,8 +144,9 @@ async function SingleUserHandler(req: NextApiRequest, res: NextApiResponse) {
       if (error !== null) {
         throw error;
       }
-      
     } else if (req.method === "DELETE") {
+      //read the session for user id
+      //use id to delete the user in db
     } else {
       res.status(405).send("Method not allowed");
     }

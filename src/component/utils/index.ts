@@ -7,4 +7,4 @@ export {useInput} from './hook/input';
 export type {TInputState, IInputAction} from './hook/input';
 export {useFetch} from './hook/fetch';
 
-export type {JsonValue, SideSignup, Signup} from './type';
+export type {JsonValue, SideSign, Signup} from './type';

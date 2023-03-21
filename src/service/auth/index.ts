@@ -124,7 +124,7 @@ const sendEmailWithToken = async (token: string, email: string, locale: string) 
     .sendMail(
       email,
       title[locale],
-      renderToString(createElement(EmailTemplate, {'url': url, 'locale': locale}))
+      renderToString(createElement(EmailTemplate, { 'url': url, 'locale': locale }))
     )
     .then((info: MailResponse) => {
       const status = parseInt(info.response.split(" ")[0]);
@@ -171,8 +171,8 @@ const checkUserRole = async (id: string) => {
       throw new Error(`500 inner server mistake`);
     }
     debug.error(`current role: ${query[0].role}`);
-    if (query[0].role != Role.Pending) {
-      //查询会话状态
+    if (query[0].role !== Role.Pending) {
+      return new Error('already');
     }
     const update = await user.updateUser(id, Role.User, "role");
     return update.success;
