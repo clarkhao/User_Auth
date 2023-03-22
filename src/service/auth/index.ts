@@ -17,9 +17,9 @@ import { ZodError } from "zod";
 import Mail from "nodemailer/lib/mailer";
 import { Role } from "../../model/type";
 const config = require("config");
-import path from 'path';
-import EmailTemplate from './emailComponent';
-import {renderToString} from 'react-dom/server';
+import path from "path";
+import EmailTemplate from "./emailComponent";
+import { renderToString } from "react-dom/server";
 import { createElement } from "react";
 
 const SECRET_KEY = process.env[config.get("key.cipher")] || "";
@@ -28,7 +28,9 @@ const EXPIRY_DURATION = 3600; // Expiry duration in seconds (1 hour)
  * this interface is used in email confirmation data
  */
 interface SignupData {
-  userId: string;
+  id: string;
+  name: string;
+  email: string;
   expiryTime: number;
 }
 
@@ -86,14 +88,14 @@ const createUser = async (signup: SignUp) => {
 /**
  * generate code inside the email url for confirming signup in a promise style
  */
-const generateSignupToken = async (userId: string) => {
+const generateSignupToken = async (id: string, name: string, email: string) => {
   // promise化
   return Promise.resolve()
     .then(async () => {
       const expiryTime = Math.floor(Date.now() / 1000) + EXPIRY_DURATION;
-      const data: SignupData = { userId, expiryTime };
+      const data: SignupData = { id, name, email, expiryTime };
       const jsonData = JSON.stringify(data);
-      const encryptedData = encrypt(jsonData, SECRET_KEY)
+      const encryptedData = encrypt(jsonData, SECRET_KEY);
       return Buffer.from(encryptedData).toString("base64url");
     })
     .catch((error) => {
@@ -105,26 +107,29 @@ const generateSignupToken = async (userId: string) => {
     });
 };
 /**
- * @param id: user table id returned by creatUser
  * @param email: email in signup data
  */
-const sendEmailWithToken = async (token: string, email: string, locale: string) => {
+const sendEmailWithToken = async (
+  token: string,
+  email: string,
+  locale: string
+) => {
   const mailer = new Mailer();
   const url = config
     .get("server.host")
     ?.concat(`:${config.get("server.port")}`)
     .concat(`/api/v0/auth/signup?locale=${locale}&code=${token}`);
   //此处使用mdx替换
-  const title: {[key: string]: string} = {
-    'cn': '注册确认',
-    'en': 'Registration Confirmation',
-    'jp': '登録確認'
-  }
+  const title: { [key: string]: string } = {
+    cn: "注册确认",
+    en: "Registration Confirmation",
+    jp: "登録確認",
+  };
   mailer
     .sendMail(
       email,
       title[locale],
-      renderToString(createElement(EmailTemplate, { 'url': url, 'locale': locale }))
+      renderToString(createElement(EmailTemplate, { url: url, locale: locale }))
     )
     .then((info: MailResponse) => {
       const status = parseInt(info.response.split(" ")[0]);
@@ -148,9 +153,19 @@ const verifySignupToken = async (code: string) => {
     const jsonData = decrypt(decodedData, SECRET_KEY);
     const dataObj = JSON.parse(jsonData) as SignupData;
     if (dataObj.expiryTime < Math.floor(Date.now() / 1000)) {
-      return { isValid: false, userId: dataObj.userId };
+      return {
+        isValid: false,
+        id: dataObj.id,
+        name: dataObj.name,
+        email: dataObj.email,
+      };
     }
-    return { isValid: true, userId: dataObj.userId };
+    return {
+      isValid: true,
+      id: dataObj.id,
+      name: dataObj.name,
+      email: dataObj.email,
+    };
   } catch (error) {
     logger.warn({
       err: `${error}`,
@@ -162,19 +177,19 @@ const verifySignupToken = async (code: string) => {
 //确认是否pending, if pending turn pending into user,
 //otherwise check authentication, if already in, do nothing just send status 200,
 // else redirect to login page with status code 307
-const checkUserRole = async (id: string) => {
+const checkUserRole = async (name: string) => {
   try {
     //read user by id
     const user = new EmailUser(db);
-    const { query, error } = await user.readUserById(id);
+    const { query, error } = await user.readUserByName(name);
     if (error) {
       throw new Error(`500 inner server mistake`);
     }
     debug.error(`current role: ${query[0].role}`);
     if (query[0].role !== Role.Pending) {
-      return new Error('already');
+      return new Error("already");
     }
-    const update = await user.updateUser(id, Role.User, "role");
+    const update = await user.updateUser(name, Role.User, "role");
     return update.success;
   } catch (error) {
     throw new Error(`500 inner server mistake`);

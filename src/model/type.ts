@@ -40,10 +40,10 @@ export type TUserInfo = Omit<TUser, 'salt' | 'hash'>;
 export type TSession = {
   id: string;
   token?: string;
-  userInfo: JsonObject;
   source?: string;
   locale: string;
-  profile?: TUserProfile;
+  userInfo: TInfo;
+  profile?: TProfile;
   createAt?: string;
 };
 export type TInfo = {
@@ -52,13 +52,10 @@ export type TInfo = {
   role: string;
 }
 export type TProfile = {
-  name: string;
-  email: string;
-  role: string;
-  locale: string;
+  firstName?: string;
+  lastName?: string;
   picture?: string;
   bio?: string;
-  createAt: string;
   lastModifiedAt: string;
 }
-export type TUserProfile = Partial<TProfile> & {id?:string};
+export type TUserProfile = Partial<TProfile> & {locale?:string} & Partial<TInfo>;

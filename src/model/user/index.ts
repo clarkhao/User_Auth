@@ -79,15 +79,15 @@ class User {
     return this._oauth;
   }
   /** 
-  * 读取单个用户的信息by id
+  * 读取单个用户的信息by name
   */
-  public readUserById(id: string) {
-    this.setId(id);
+  public readUserName(name: string) {
+    this.setName(name);
     return this.db.connect(`
       select "id","name","type","email","role","createAt","lastUpdateAt","profile","oauth"
       from auth.user
-      where id=$1;
-    `, { isReturning: false, isTransaction: false }, [this.id]) as Promise<{
+      where name=$1;
+    `, { isReturning: false, isTransaction: false }, [this.name]) as Promise<{
       success: boolean;
       query: TUserInfo[];
       error: Error | null;
@@ -102,6 +102,27 @@ class User {
       from auth.user
       order by "createAt" asc limit $1 offset $2;
     `, { isReturning: false, isTransaction: false }, [limit, offset]) as Promise<{
+      success: boolean;
+      query: TUserInfo[];
+      error: Error | null;
+    }>;
+  }
+  /**
+   * update oauth用户的profile
+   */
+   public updateUser(name: string, profile: JsonValue) {
+    this.setName(name);
+    this.setProfile(profile);
+    return this.db.connect(
+      `
+      update auth.user
+      set "profile"=$2 "lastUpdateAt"=$3
+      where "name"=$1
+      returning "id","name","type","email","role","createAt","lastUpdateAt","profile","oauth"; 
+    `,
+      { isReturning: true, isTransaction: false },
+      [this.name, this.profile, new Date(Date.now()).toISOString()]
+    ) as Promise<{
       success: boolean;
       query: TUserInfo[];
       error: Error | null;

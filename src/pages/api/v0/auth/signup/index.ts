@@ -81,71 +81,69 @@ async function SignUpHandler(req: NextApiRequest, res: NextApiResponse) {
   try {
     LoggerMiddleware(req, res);
     const locale = req.query["locale"] as string;
-    switch (req.method) {
-      case "POST":
-        if (locale === undefined || !["cn", "en", "jp"].includes(locale))
-          res.status(400).json({ msg: "oauth query string missing" });
-        //decrypt req.body
-        const { data, error } = DecryptMiddleware(req);
-        if (error !== null) {
-          throw error;
+    if (req.method === "POST") {
+      if (locale === undefined || !["cn", "en", "jp"].includes(locale))
+        res.status(400).json({ msg: "oauth query string missing" });
+      //decrypt req.body
+      const { data, error } = DecryptMiddleware(req);
+      if (error !== null) {
+        throw error;
+      }
+      //verify the input signup data, and duplicate signup info check
+      const signupData = verifySignupData(data);
+      await isSignupRepeated(signupData);
+      //save signup info into db
+      const { id, email, name } = await createUser(signupData);
+      //generate the code inside email url
+      generateSignupToken(id, name, email).then((token) => {
+        if (token instanceof Error) {
+          return;
+        } else {
+          //send email for confirmation
+          sendEmailWithToken(token, email, locale || "cn");
         }
-        //verify the input signup data, and duplicate signup info check
-        const signupData = verifySignupData(data);
-        await isSignupRepeated(signupData);
-        //save signup info into db
-        const { email, id } = await createUser(signupData);
-        //generate the code inside email url
-        generateSignupToken(id).then((token) => {
+      });
+      //response
+      //add headers or cookie
+      //add status code and json here
+      res.status(201).json({ email, name });
+    } else if (req.method === "GET") {
+      const code = req.query["code"];
+      if (typeof code !== "string") throw new Error(`400 invalid url`);
+      //validate the email token，如失效，重发连接
+      const { isValid, id, name, email } = await verifySignupToken(code);
+      if (!isValid) {
+        generateSignupToken(id, name, email).then((token) => {
           if (token instanceof Error) {
             return;
           } else {
-            //send email for confirmation
-            sendEmailWithToken(token, signupData.email, locale || "cn");
+            sendEmailWithToken(token, email, locale || "cn");
           }
         });
-        //response
-        //add headers or cookie
-        //add status code and json here
-        res.status(201).json({ email });
-        break;
-      case "GET":
-        const code = req.query["code"];
-        if (typeof code !== "string") throw new Error(`400 invalid url`);
-        //validate the email token，如失效，重发连接
-        const { isValid, userId } = await verifySignupToken(code);
-        if (!isValid) {
-          generateSignupToken(userId).then((token) => {
-            if (token instanceof Error) {
-              return;
-            } else {
-              sendEmailWithToken(token, signupData.email, locale || "cn");
-            }
-          });
-          res.status(301).end();
-        }
-        //确认是否pending, if pending turn pending into user,
-        //otherwise check authentication, if already in, do nothing just send status 200,
-        //else redirect to login page with status code 307
-        //update the user
-        const update = await checkUserRole(userId);
-        if(update instanceof Error) {
-          res.status(204).end();
-        } else if (update) {
-          res.setHeader(
-            "location",
-            `${(process.env.NEXT_PUBLIC_ORIGIN as string).concat("/v0/auth/profile")}`
-          );
-          //获取token
-          res.status(307).end();
-        } else {
-          debug.error({ err: "failed to update role from pending to user" });
-          throw new Error(`500 inner server mistake`);
-        }
-        break;
-      default:
-        res.status(405).send("Method not allowed");
-        break;
+        res.status(301).end();
+      }
+      //确认是否pending, if pending turn pending into user,
+      //otherwise check authentication, if already in, do nothing just send status 200,
+      //else redirect to login page with status code 307
+      //update the user
+      const update = await checkUserRole(name);
+      if (update instanceof Error) {
+        res.status(204).end();
+      } else if (update) {
+        res.setHeader(
+          "location",
+          `${(process.env.NEXT_PUBLIC_ORIGIN as string).concat(
+            "/v0/auth/profile"
+          )}`
+        );
+        //获取token
+        res.status(307).end();
+      } else {
+        debug.error({ err: "failed to update role from pending to user" });
+        throw new Error(`500 inner server mistake`);
+      }
+    } else {
+      res.status(405).send("Method not allowed");
     }
   } catch (err) {
     ErrorMiddleware(err, res);

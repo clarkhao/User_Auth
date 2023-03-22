@@ -66,13 +66,15 @@ const saveSession = async ({
   //createAt date额外加了8h, 读取的时候要-8h
   createAt = new Date(Date.now() + 8 * 60 * 60 * 1000).toJSON(),
   ...props
-}: TSession & {accessToken?: string}) => {
+}: TSession & { accessToken?: string }) => {
   try {
-    const accessToken = props.accessToken ?? generateToken(
-      props.id,
-      process.env[config.get("key.access")] as string,
-      "3h"
-    );
+    const accessToken =
+      props.accessToken ??
+      generateToken(
+        props.id,
+        process.env[config.get("key.access")] as string,
+        "3h"
+      );
     const refreshToken =
       source !== "email" || props.token
         ? props.token
@@ -91,8 +93,26 @@ const saveSession = async ({
     const { success } = await setRedis(accessToken, session);
     return { success, accessToken };
   } catch (err) {
-    debug.error(`from service/oauth/index: ${err}`);
+    debug.error(`from service/auth/signin/saveSession: ${err}`);
     throw err;
   }
 };
-export { verifySigninData, isMatchUser, saveSession };
+/**
+ * update hash
+ */
+const updateHash = async (name: string, newPwd: string) => {
+  try {
+    const salt = crypto.randomBytes(16).toString("hex");
+    if (salt === null) throw new Error(`500 failed to set salt`);
+    const hash = crypto
+      .pbkdf2Sync(newPwd, salt, 1000, 64, `sha512`)
+      .toString(`hex`);
+    const user = new EmailUser(db);
+    const { success } = await user.updateUser(name, { hash, salt }, "hash");
+    return success;
+  } catch (err) {
+    debug.error(`from service/auth/signin/updateHash: ${err}`);
+    throw err;
+  }
+};
+export { verifySigninData, isMatchUser, saveSession, updateHash };
