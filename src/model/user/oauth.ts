@@ -4,6 +4,7 @@ import { User } from "./index";
 import { PGConnect } from "src/utils";
 import { EmailUser } from "./email";
 import { v4 as uuidv4 } from "uuid";
+import crypto from "crypto";
 
 class OauthUser extends User {
   public constructor(db: PGConnect, emailUser?: EmailUser) {
@@ -20,6 +21,7 @@ class OauthUser extends User {
     source: UserType
   ) {
     this.setId(uuidv4());
+    const oauthName = name.concat(`${crypto.randomBytes(6).toString("hex")}`);
     this.setName(name);
     this.setType(source);
     this.setEmail(email);
@@ -62,28 +64,6 @@ class OauthUser extends User {
   /**
    * oauth用户可以通过添加email和hash新建一个email账户
    */
-
-  /**
-   * update oauth用户的profile
-   */
-  public updateUser(id: string, profile: JsonValue) {
-    this.setId(id);
-    this.setProfile(profile);
-    return this.db.connect(
-      `
-      update auth.user
-      set "profile"=$2 "lastUpdateAt"=$3
-      where "id"=$1
-      returning "id","name","type","email","role","createAt","lastUpdateAt","profile","oauth"; 
-    `,
-      { isReturning: true, isTransaction: false },
-      [this.id, this.profile, new Date(Date.now()).toISOString()]
-    ) as Promise<{
-      success: boolean;
-      query: TUserInfo[];
-      error: Error | null;
-    }>;
-  }
 }
 
 export { OauthUser };

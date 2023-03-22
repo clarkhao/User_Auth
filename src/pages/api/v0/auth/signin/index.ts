@@ -10,6 +10,7 @@ import {
   redirectToOauth,
   generateSignupToken,
   sendEmailWithToken,
+  updateHash
 } from "src/service";
 import { setCookie } from "src/middleware/cookie";
 import { getRedis, debug, delRedis, verifyToken } from "src/utils";
@@ -104,6 +105,24 @@ const config = require("config");
  *       500:
  *         description: inner server mistake
  *         $ref: '#/components/responses/ServerMistake'
+ *   put:
+ *     description: email user update the password
+ *     requestBody:
+ *       description: user information post for signin
+ *       content:
+ *         application/x-www-form-urlencoded:
+ *           schema:
+ *             $ref: '#components/schemas/Encrypted'
+ *     tags:
+ *       - auth
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       204:
+ *         description: successfull updated password
+ *       500:
+ *         description: inner server mistake
+ *         $ref: '#/components/responses/ServerMistake'
  *   delete:
  *     description: user log out, delete access token, refresh token and session record in redis, authen needed
  *     tags:
@@ -156,13 +175,11 @@ async function SignInHandler(req: NextApiRequest, res: NextApiResponse) {
       if (isMatched) {
         //generate access token and refresh token
         const userInfo = { name, email, role };
-        const profile =
-          rawProfile !== null ? JSON.parse(rawProfile as string) : userInfo;
         const { success, accessToken } = await saveSession({
           id,
           locale,
           userInfo,
-          profile,
+          profile: JSON.parse(rawProfile as string),
         });
         if (success)
           res.status(200).json({ token: accessToken, locale, userInfo, id });
@@ -175,9 +192,9 @@ async function SignInHandler(req: NextApiRequest, res: NextApiResponse) {
       const session = await getRedis(accessToken);
       if (session.error !== null) throw session.error;
       const { id, userInfo, locale } = session.data;
-      const { email, role } = userInfo;
+      const { name, email, role } = userInfo;
       if (role === "pending") {
-        generateSignupToken(id).then((token) => {
+        generateSignupToken(id, name, email).then((token) => {
           if (token instanceof Error) {
             throw new Error(`${token}`);
           } else {
@@ -188,8 +205,26 @@ async function SignInHandler(req: NextApiRequest, res: NextApiResponse) {
       } else {
         res.status(403).end();
       }
+    } else if (req.method === "PUT") {
+      //需要确认权限，只有role=user的可以请求此资源
+      const accessToken = await AuthMiddleware(req, res);
+      const session = await getRedis(accessToken);
+      if (session.error !== null) throw session.error;
+      const { userInfo } = session.data;
+      const {name, role} = userInfo;
+      if(role === 'pending')
+        res.status(403).end();
+      const { data, error } = DecryptMiddleware(req);
+      if (error !== null) {
+        throw error;
+      }
+      const {newPwd} = JSON.parse(data);
+      if(await updateHash(name, newPwd))
+        res.status(204).end();
+      else 
+        res.status(500).json({msg: 'inner server mistake'});
     } else if (req.method === "DELETE") {
-      const aToken = (req.headers["authorization"] as string).split(' ')[1];
+      const aToken = (req.headers["authorization"] as string).split(" ")[1];
       const aTokenVerified = verifyToken(
         aToken,
         process.env[config.get("key.access")] as string

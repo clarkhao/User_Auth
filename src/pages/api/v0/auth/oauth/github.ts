@@ -76,18 +76,13 @@ async function oauthHandler(req: NextApiRequest, res: NextApiResponse) {
               role: role === Role.User ? "user" : "admin",
             };
             console.log(`profile: ${profile}`)
-            const userProfile =
-              profile !== null
-                ? (JSON.parse(profile as string) as TProfile)
-                : info;
-            console.log(profile);
             return saveSession({
               id,
               token,
               userInfo: info,
               source: "github",
               locale: cookie,
-              profile: userProfile,
+              profile: JSON.parse(profile as string)
             });
           })
           .catch((err) => {

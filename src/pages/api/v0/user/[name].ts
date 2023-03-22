@@ -5,20 +5,19 @@ import { DecryptMiddleware } from "src/middleware/decrypt";
 import { AuthMiddleware } from "src/middleware/auth";
 import { setRedis, getRedis, delRedis, db } from "src/utils";
 import { TSession, TUserProfile, TInfo, Role, UserType } from "src/model/type";
-import { User } from "src/model";
-import { saveSession } from "src/service";
+import { saveSession, updateProfile, deleteUser } from "src/service";
 
 /**
  * @swagger
- * /api/v0/user/{id}:
+ * /api/v0/user/{name}:
  *   parameters:
  *     - in: path
- *       name: id
+ *       name: name
  *       schema:
  *         type: string
- *       description: user id
+ *       description: user name
  *   get:
- *     description: get a user info by id, need authen + author
+ *     description: get a user info by name, need authen + author
  *     tags:
  *       - user
  *     security:
@@ -72,7 +71,7 @@ import { saveSession } from "src/service";
  *       500:
  *         $ref: '#/components/responses/ServerMistake'
  *   delete:
- *     description: delete a user by id, authen needed
+ *     description: delete a user by name, authen needed
  *     tags:
  *       - user
  *     security:
@@ -90,63 +89,51 @@ import { saveSession } from "src/service";
 async function SingleUserHandler(req: NextApiRequest, res: NextApiResponse) {
   try {
     LoggerMiddleware(req, res);
-    const { id } = req.query;
-    console.log(id);
-    if(id === undefined) throw new Error(`400 parameter id missing`)
+    const { name } = req.query;
+    console.log(name);
+    if (name === undefined) throw new Error(`400 parameter name missing`);
     const accessToken = await AuthMiddleware(req, res);
     if (req.method === "GET") {
       //first read session.profile and info
-      //if not read db.profile and info
-      let userProfile: TUserProfile = {};
       const { data, error } = await getRedis(accessToken);
-      if (error === null) {
-        const { id, userInfo, profile } = data as TSession;
-        const info = {
-          name: userInfo.name,
-          email: userInfo.email,
-          role: userInfo.role,
-        } as TInfo;
-        //权限
-        if (info.role === "pending")
-          throw new Error(`403 authorization failed`);
-        userProfile = { id, ...profile };
-      } else {
-        const user = new User(db);
-        const { success, query, error } = await user.readUserById(id as string);
-        if (error !== null) throw new Error(`500 inner server error`);
-        const { name, type, email, role, oauth, profile } = query[0];
-        //权限
-        if (type === UserType.Email && role === Role.Pending)
-          throw new Error(`403 authorization failed`);
-        else if (type !== UserType.Email)
-          throw new Error(`401 authentication missing`);
-        const info = {
-          name,
-          email,
-          role: role === Role.User ? "user" : "admin",
-        };
-        const userInfo = JSON.parse(profile as string);
-        userProfile = { id, ...userInfo };
-        //重新存入redis
-        const result = await saveSession({
-          id: id as string,
-          accessToken,
-          userInfo: info,
-          profile: userInfo,
-          source: "email",
-          locale: "cn",
-        });
-      }
-      res.status(200).json({ profile: { ...userProfile } });
-    } else if (req.method === "POST") {
-      //decrypt req.body
-      const { data, error } = DecryptMiddleware(req);
       if (error !== null) {
-        throw error;
+        throw new Error(`500 read from redis mistake`);
       }
+      const { locale, userInfo, profile } = data as TSession;
+      const { role } = userInfo;
+      //权限
+      if (role === "pending") throw new Error(`403 authorization failed`);
+      res.status(200).json({ profile: { locale, ...userInfo, ...profile } });
+    } else if (req.method === "POST") {
+      const { data, error } = await getRedis(accessToken);
+      if (error !== null) {
+        throw new Error(`500 read from redis mistake`);
+      }
+      const { userInfo } = data as TSession;
+      if (userInfo.role === "pending" || userInfo.name !== name)
+        throw new Error(`403 authorization failed`);
+      //decrypt req.body
+      const decrypted = DecryptMiddleware(req);
+      if (decrypted.error !== null) {
+        throw decrypted.error;
+      }
+      const query = await updateProfile(name, decrypted.data);
+      const {profile} = query;
+      await saveSession({...data, profile, accessToken});
+      res.status(204).end();
+      //查看更新的用户类型
     } else if (req.method === "DELETE") {
-      //read the session for user id
+      //read the session for user name
       //use id to delete the user in db
+      const { data, error } = await getRedis(accessToken);
+      if (error !== null) {
+        throw new Error(`500 read from redis mistake`);
+      }
+      const { id, userInfo } = data as TSession;
+      if (userInfo.role === "pending" || userInfo.name !== name)
+        throw new Error(`403 authorization failed`);
+      await deleteUser([id]);
+      res.status(204).end();
     } else {
       res.status(405).send("Method not allowed");
     }

@@ -17,4 +17,5 @@ export {
 } from "./oauth";
 export { getTokenFromGoogle } from "./oauth/google";
 
-export { verifySigninData, isMatchUser, saveSession } from "./auth/signin";
+export { verifySigninData, isMatchUser, saveSession, updateHash } from "./auth/signin";
+export {updateProfile, deleteUser} from './user';

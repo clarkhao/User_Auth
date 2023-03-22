@@ -28,7 +28,7 @@ class EmailUser extends User {
       `
       insert into auth.user ("id", "name", "type", "email", "role", "salt", "hash")
       values ($1, $2, $3, $4, $5, $6, $7)
-      returning "email", "id";
+      returning "id", "name", "email";
     `,
       { isReturning: true, isTransaction: false },
       [
@@ -42,7 +42,7 @@ class EmailUser extends User {
       ]
     ) as Promise<{
       success: boolean;
-      query: { email: string; id: string }[];
+      query: { id: string; name: string; email: string }[];
       error: Error | null;
     }>;
   }
@@ -58,7 +58,7 @@ class EmailUser extends User {
       `
       SELECT
       CASE
-        WHEN (SELECT COUNT(*) FROM auth.user WHERE name = $1 and type = $3) > 0 
+        WHEN (SELECT COUNT(*) FROM auth.user WHERE name = $1) > 0 
         THEN true
         ELSE false
       END as name,
@@ -77,22 +77,19 @@ class EmailUser extends User {
     }>;
   }
   /**
-   * read user by name/email and hash，确认用户输入账户和密码是否匹配，name或者email，使用validation确认
-   * 分两步，第一步，确认user是否存在，如果存在确认role pending or user
-   * 第二步，如果pending返回，如果user返回
+   * read user by name and hash，确认用户输入账户和密码是否匹配，name或者email，使用validation确认
    */
   public readUserByName(name: string) {
     this.setName(name);
-    this.setType(UserType.Email);
     return this.db.connect(
       `
         with exist_user as (
-          select * from auth.user WHERE name = $1 and type = $2
+          select * from auth.user WHERE name = $1
         ) 
         select id, email, salt, hash, role, profile from exist_user;
       `,
       { isReturning: false, isTransaction: false },
-      [this.name, this.type]
+      [this.name]
     ) as Promise<{
       success: boolean;
       query: {
@@ -109,47 +106,25 @@ class EmailUser extends User {
   /**
    * 如果property是'name'则更新name和profile,如果property是email,则更新email和hash，默认更新role为user或者admin
    */
-  public updateUser(
-    id: string,
-    value:
-      | { name: string; profile: JsonValue }
-      | { email: string; hash: string }
-      | Role,
+  public override updateUser(
+    name: string,
+    value: {hash: string, salt: string} | Role,
     property?: keyof EmailUser
   ) {
-    this.setId(id);
+    this.setName(name);
     switch (property) {
-      case "name":
-        this.setName((value as { name: string; profile: JsonValue }).name);
-        this.setProfile(
-          (value as { name: string; profile: JsonValue }).profile
-        );
-        return this.db.connect(
-          `
-          update auth.user
-          set "name"=$2, "profile"=$3, "lastUpdateAt"=$4
-          where "id"=$1
-          returning "id","name","type","email","role","createAt","lastUpdateAt","profile","oauth";
-        `,
-          { isReturning: true, isTransaction: false },
-          [this.id, this.name, this.profile, new Date(Date.now()).toISOString()]
-        ) as Promise<{
-          success: boolean;
-          query: TUserInfo[];
-          error: Error | null;
-        }>;
-      case "email":
-        this.setEmail((value as { email: string; hash: string }).email);
-        this.setHash((value as { email: string; hash: string }).hash);
+      case "hash":
+        this.setSalt((value as {hash: string, salt: string}).salt)
+        this.setHash((value as {hash: string, salt: string}).hash);
         return this.db.connect(
           `
           update auth.user 
-          set "email"=$2, "hash"=$3, "lastUpdateAt"=$4
-          where "id"=$1
+          set "hash"=$2, "salt"=$3, "lastUpdateAt"=$4
+          where "name"=$1
           returning "id","name","type","email","role","createAt","lastUpdateAt","profile","oauth";
         `,
           { isReturning: true, isTransaction: false },
-          [this.id, this.email, this.hash, new Date(Date.now()).toISOString()]
+          [this.name, this.hash, this.salt, new Date(Date.now()).toISOString()]
         ) as Promise<{
           success: boolean;
           query: TUserInfo[];
@@ -161,11 +136,11 @@ class EmailUser extends User {
           `
             update auth.user
           set "role"=$2, "lastUpdateAt"=$3
-          where "id"=$1
+          where "name"=$1
           returning "id","name","type","email","role","createAt","lastUpdateAt","profile","oauth";
         `,
           { isReturning: true, isTransaction: false },
-          [this.id, this.role, new Date(Date.now()).toISOString()]
+          [this.name, this.role, new Date(Date.now()).toISOString()]
         ) as Promise<{
           success: boolean;
           query: TUserInfo[];
