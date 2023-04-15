@@ -1,18 +1,9 @@
 .container {
   display: flex;
   flex-direction: row;
+  justify-content: flex-end;
+  align-items: center;
   flex-wrap: wrap;
-  position: absolute;
-  float: right;
-  top: 2.5%;
-  right: 20px;
+  column-gap: 20px;
   z-index: 11;
-}
-.container div {
-  margin-left: 20px;
-}
-@media screen and (min-width: 570px) and (max-width: 900px) {
-  .container {
-    right: 22%;
-  }
 }

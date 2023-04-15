@@ -1,0 +1,15 @@
+.icon {
+  width: var(--follower-icon-size);
+  height: var(--follower-icon-size);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.icon span {
+  font-size: calc(var(--follower-icon-size)/3);
+}
+.icon p {
+  font-size: calc(var(--follower-icon-size)/8);
+  font-weight: 300;
+}

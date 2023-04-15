@@ -23,10 +23,10 @@ type SwitchType = {
   /**
    * size
    */
-  size?: string;
+  size?: number;
 };
 
-function Switch({ isSvg = true, size = "100px", ...props }: SwitchType) {
+function Switch({ isSvg = true, size = 100, ...props }: SwitchType) {
   const theme = useTheme();
   const id = React.useId();
   const [toggle, setToggle] = React.useState(false);
@@ -45,7 +45,7 @@ function Switch({ isSvg = true, size = "100px", ...props }: SwitchType) {
             ? "linear-gradient(to bottom, #0f2027, #203a43, #2c5364)"
             : "linear-gradient(to bottom, #4facfe, #00f2fe)"};
           --switch-btn-color: ${props.toggle ?? toggle ? "#003" : "white"};
-          --toggle-size: ${size};
+          --toggle-size: ${size}px;
           --toggle-box-shadow: ${theme.shadows[4]};
         `}
       >

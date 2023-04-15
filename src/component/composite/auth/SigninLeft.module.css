@@ -11,12 +11,18 @@
   background-color: var(--signin-left-bg);
   box-shadow: var(--signin-left-shadow);
   padding-bottom: 50px;
+  color: var(--signin-right-font-color);
 }
 .header {
   display: flex;
   flex-direction: column;
   justify-content: space-evenly;
   row-gap: 10px;
+}
+.icons {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
 }
 .header h2 {
   padding-left: 10px;

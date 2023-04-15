@@ -1,0 +1,23 @@
+{
+  "left": {
+    "title": "欢迎回来！请登录",
+    "oauth_github": "使用GITHUB登陆",
+    "oauth_google": "使用GOOGLE登陆",
+    "auth_hint": "或者",
+    "user_title": "用户名",
+    "user_min_err": "用户名至少5位字符",
+    "user_max_err": "用户名最多25位字符",
+    "user_regex_err": "用户名只能有字母数字组成",
+    "password_title": "密码",
+    "password_min_err": "至少6位字符",
+    "password_max_err": "最多25位字符",
+    "password_regex_err": "包含至少1位大写小写字母或数字",
+    "submit": "创建账户",
+    "http_401_name": "用户名错误",
+    "http_401_pwd": "密码错误"
+  },
+  "right": {
+    "title": "还没有账户？去注册",
+    "submit": "注册"
+  }
+}

@@ -12,6 +12,7 @@ import Button from "@mui/material/Button";
 import { iconLibrary, JsonValue } from "../../utils";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import ThemeI18n from "../ThemeI18n";
 //type
 import { SideSign } from "../../utils";
 
@@ -187,9 +188,12 @@ function SignupRight({ i18n, ...props }: TSignupRight) {
     >
       <header>
         <div className={style.title}>{i18n?.title ?? "创建账户"}</div>
-        <Link href="/v0/auth/signin">
-          {i18n?.signinHint ?? "已有账户直接登陆"}
-        </Link>
+        <div className={style.icons}>
+          <ThemeI18n size={50} />
+          <Link href="/v0/auth/signin">
+            {i18n?.signinHint ?? "已有账户直接登陆"}
+          </Link>
+        </div>
       </header>
       <main className={style.main}>
         <form id="signup-form" className={style.form}>
@@ -247,7 +251,7 @@ function SignupRight({ i18n, ...props }: TSignupRight) {
               variant="contained"
               startIcon={iconLibrary.get("github")}
               color="info"
-              size='medium'
+              size="medium"
             >
               <Link href={`/api/v0/auth/signin?oauth=github&locale=${locale}`}>
                 {i18n?.oauth_github ?? "使用GITHUB登陆"}
@@ -257,7 +261,7 @@ function SignupRight({ i18n, ...props }: TSignupRight) {
               variant="contained"
               startIcon={iconLibrary.get("google")}
               color="warning"
-              size='medium'
+              size="medium"
             >
               <Link href={`/api/v0/auth/signin?oauth=google&locale=${locale}`}>
                 {i18n?.oauth_google ?? "使用GOOGLE登陆"}

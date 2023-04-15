@@ -7,6 +7,7 @@ import { lightTheme, darkTheme } from "../utils";
 //组件
 import Switch from "../ui/SwitchUI";
 import Select from "../ui/Select";
+import AvatarSelect from "../ui/AvatarSelect";
 
 type TThemeI18nLayout = {
   /**
@@ -17,12 +18,20 @@ type TThemeI18nLayout = {
    * right
    */
   right: React.ReactNode;
+  /**
+   * avatar?
+   */
+  avatar?: React.ReactNode;
 };
 type TThemeI18n = {
   /**
    * size
    */
-  size: string;
+  size: number;
+  /**
+   * hasAvatar?
+   */
+  hasAvatar?: boolean;
 };
 
 function ThemeI18nLayout({ left, right, ...props }: TThemeI18nLayout) {
@@ -30,10 +39,11 @@ function ThemeI18nLayout({ left, right, ...props }: TThemeI18nLayout) {
     <div className={style.container}>
       {left}
       {right}
+      {props.avatar}
     </div>
   );
 }
-function ThemeI18n({ size, ...props }: TThemeI18n) {
+function ThemeI18n({ size, hasAvatar = false, ...props }: TThemeI18n) {
   const [toggle, setToggle] = React.useState(false);
   const toggleTheme = useThemeStore((state) => state.toggleTheme);
   const handleClick = (e: React.MouseEvent) => {
@@ -46,6 +56,7 @@ function ThemeI18n({ size, ...props }: TThemeI18n) {
       <ThemeI18nLayout
         left={<Switch size={size} handleClick={handleClick} toggle={toggle} />}
         right={<Select size={size} />}
+        avatar={hasAvatar ? <AvatarSelect size={size - 20} /> : null}
       />
     </>
   );

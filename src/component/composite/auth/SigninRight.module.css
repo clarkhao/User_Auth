@@ -11,4 +11,11 @@
   box-shadow: var(--signin-right-shadow);
   padding: 0px 30px;
   padding-bottom: 50px;
+  color: var(--signin-left-font-color);
+}
+.container main {
+  flex: 0 1 auto;
+}
+.container button {
+  flex: 0 0 auto;
 }

@@ -1,0 +1,22 @@
+.skeleton {
+  width: var(--image-skeleton-width);
+  height: var(--image-skeleton-height);
+  background-color: #ddd;
+  opacity: 1;
+  margin-top: 10px;
+  animation: shining 2s ease-in-out infinite;
+}
+.display {
+  display: block;
+}
+.disappear {
+  display: none;
+}
+@keyframes shining {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}

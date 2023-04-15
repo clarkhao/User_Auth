@@ -6,7 +6,7 @@
 //应用模块
 import React from 'react';
 //style和主题
-import style from '../../styles/assetsUpload.module.css';
+import style from './upload.module.css';
 import { PaletteMode, createTheme, ThemeProvider } from '@mui/material';
 //组件
 import CardLayout from "src/component/layout/CardLayout";

@@ -35,10 +35,11 @@ function SigninRight({ i18n, src, ...props }: TSigninRight) {
           ? "white"
           : theme.palette.secondary.main};
         --signin-right-shadow: ${theme.shadows[4]};
+        --signin-left-font-color: ${theme.palette.primary.contrastText};
       `}
     >
       <header>
-        <h2>{"还没有账户？去注册"}</h2>
+        <h2>{i18n?.title ?? "还没有账户？去注册"}</h2>
       </header>
       <main>
         <Player
