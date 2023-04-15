@@ -1,0 +1,38 @@
+.image {
+  min-height: 250px;
+}
+.caption {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  row-gap: 5px;
+  padding: 0 5px;
+  color: var(--profile-text-color);
+}
+.caption > div {
+  width: 100%;
+}
+.footer {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+.avarta {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  column-gap: 5px;
+}
+.none {
+  visibility: hidden;
+  height: 0px;
+}
+.visible {
+  visibility: visible;
+  height: auto;
+}

@@ -1,0 +1,23 @@
+{
+  "left": {
+    "title": "Welcome back! Please log in",
+    "oauth_github": "Log in with Github",
+    "oauth_google": "Log in with Google",
+    "auth_hint": "Or",
+    "user_title": "Username",
+    "user_min_err": "Username must be at least 5 characters",
+    "user_max_err": "Username can be at most 25 characters",
+    "user_regex_err": "Username can only contain letters and numbers",
+    "password_title": "Password",
+    "password_min_err": "Password must be at least 6 characters",
+    "password_max_err": "Password can be at most 25 characters",
+    "password_regex_err": "Password must contain at least 1 uppercase letter, 1 lowercase letter, or 1 digit",
+    "submit": "Create Account",
+    "http_401_name": "Invalid username",
+    "http_401_pwd": "Invalid password"
+  },
+  "right": {
+    "title": "Don't have an account yet? Sign up",
+    "submit": "Sign Up"
+  }
+}

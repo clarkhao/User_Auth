@@ -1,0 +1,24 @@
+.container {
+}
+.main {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: flex-start;
+  background-color: var(--profile-bg-color);
+}
+.display {
+  height: calc(100vh - 60px);
+  width: 100%;
+  overflow: auto;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: flex-start;
+}
+.indent {
+  width: calc(100% - 250px);
+  justify-content: flex-start;
+}

@@ -1,0 +1,23 @@
+{
+  "left": {
+    "title": "お帰りなさい！ログインしてください",
+    "oauth_github": "GitHubでログインする",
+    "oauth_google": "Googleでログインする",
+    "auth_hint": "または",
+    "user_title": "ユーザー名",
+    "user_min_err": "ユーザー名は5文字以上である必要があります",
+    "user_max_err": "ユーザー名は25文字以下である必要があります",
+    "user_regex_err": "ユーザー名には、英数字のみ使用できます",
+    "password_title": "パスワード",
+    "password_min_err": "パスワードは6文字以上である必要があります",
+    "password_max_err": "パスワードは25文字以下である必要があります",
+    "password_regex_err": "パスワードには、大文字、小文字、数字のいずれかを含める必要があります",
+    "submit": "アカウントを作成",
+    "http_401_name": "ユーザー名が正しくありません",
+    "http_401_pwd": "パスワードが正しくありません"
+  },
+  "right": {
+    "title": "まだアカウントをお持ちでない方は、登録してください",
+    "submit": "登録"
+  }
+}

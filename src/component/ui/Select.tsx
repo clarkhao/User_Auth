@@ -1,26 +1,22 @@
 //应用
 import React, { Fragment } from "react";
-import { useRouter } from 'next/router';
+import { useRouter } from "next/router";
 //style
 import style from "./Select.module.css";
 import { css } from "@emotion/react";
 import { useTheme } from "@mui/material/styles";
 //组件
 import { FiGlobe } from "react-icons/fi";
+import Menu from "./Menu";
 
 type TSelect = {
   /**
    * size
    */
-  size?: string;
+  size?: number;
 };
-const i18nMap: {[key:string]: string} = {
-  'CN': 'cn',
-  'EN': 'en',
-  'JP': 'jp'
-}
 
-function Select({ size = "100px", ...props }: TSelect) {
+function Select({ size = 50, ...props }: TSelect) {
   const theme = useTheme();
   const router = useRouter();
   const { pathname, asPath, query, locale } = router;
@@ -29,6 +25,10 @@ function Select({ size = "100px", ...props }: TSelect) {
   const handleSelect = (e: React.MouseEvent) => {
     e.preventDefault();
     setInProp(!inProp);
+  };
+  const handleElement = (v: string) => {
+    router.push({ pathname, query }, asPath, { locale: v });
+    setInProp(false);
   };
   React.useEffect(() => {
     const mouseHandler = (e: MouseEvent) => {
@@ -45,36 +45,25 @@ function Select({ size = "100px", ...props }: TSelect) {
   }, []);
   return (
     <div
-      id='i18n-btn'
+      id="i18n-btn"
       className={style.btn}
       onClick={handleSelect}
       css={css`
-        --select-size: ${size};
+        --select-size: ${size}px;
         --i18n-button-bg: ${theme.palette.grey[500]};
         --select-text-color: ${theme.palette.primary.contrastText};
         --select-box-shadow: ${theme.shadows[4]};
       `}
     >
       <FiGlobe />
-      <span className={style.title}>{locale?.toUpperCase() ?? 'CN'}</span>
-      <ul
-        id='i18n-show'
-        className={[style.drop_down_content, inProp ? style.show : ''].join(' ')}
-      >
-        {["CN", "EN", "JP"].map((v, i) => (
-          <li
-            key={`i18n-${i}`}
-            onClick={(e) => {
-              e.preventDefault;
-              e.stopPropagation();
-              router.push({ pathname, query }, asPath, { locale: i18nMap[v] })
-              setInProp(false);
-            }}
-          >
-            {v}
-          </li>
-        ))}
-      </ul>
+      <span className={style.title}>{locale?.toUpperCase() ?? "CN"}</span>
+      <Menu
+        id="i18n-show"
+        isShown={inProp}
+        handleElement={handleElement}
+        content={["cn", "en", "jp"]}
+        offset={-(100-size)/2}
+      />
     </div>
   );
 }

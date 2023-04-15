@@ -1,0 +1,27 @@
+.container {
+  width: 250px;
+  height: calc(100vh - 60px);
+  background-color: var(--sidebar-menu-bg-color);
+  color: var(--sidebar-menu-font-color);
+  transition: left 0.1s;
+  z-index: 9;
+  padding: 10px;
+  flex: 1 0 auto;
+}
+.main ul {
+  margin: 0;
+  padding: 0;
+  
+}
+.main ul > li {
+  display: block;
+  cursor: pointer;
+  text-align: left;
+  padding: 5px;
+}
+.main ul > li:hover {
+  background-color: lightgray;
+}
+.hide {
+  display: none;
+}

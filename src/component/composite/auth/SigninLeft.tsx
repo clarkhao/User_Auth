@@ -13,6 +13,7 @@ import Button from "@mui/material/Button";
 import { iconLibrary } from "../../utils";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import ThemeI18n from "../ThemeI18n";
 //type
 import { SideSign } from "../../utils";
 
@@ -125,8 +126,12 @@ function SigninLeft({ i18n, ...props }: TSigninLeft) {
             setErrMsgs({
               ...errMsgs,
               ...{
-                name: messages.includes("name") ? "用户名错误" : "",
-                password: messages.includes("password") ? "密码错误" : "",
+                name: messages.includes("name")
+                  ? i18n?.http_401_name ?? "用户名错误"
+                  : "",
+                password: messages.includes("password")
+                  ? i18n?.http_401_pwd ?? "密码错误"
+                  : "",
               },
             });
             break;
@@ -143,11 +148,15 @@ function SigninLeft({ i18n, ...props }: TSigninLeft) {
       css={css`
         --signin-left-bg: ${theme.palette.neutral.main};
         --signin-left-shadow: ${theme.shadows[4]};
+        --signin-right-font-color: ${theme.palette.text.primary};
       `}
     >
       <header className={style.header}>
-        <Mark size={50} />
-        <h2>{"欢迎回来！请登录"}</h2>
+        <div className={style.icons}>
+          <Mark size={50} />
+          <ThemeI18n size={50} />
+        </div>
+        <h2>{i18n?.title ?? "欢迎回来！请登录"}</h2>
       </header>
       <main className={style.main}>
         <div className={style.oauth}>
@@ -171,7 +180,7 @@ function SigninLeft({ i18n, ...props }: TSigninLeft) {
               {i18n?.oauth_google ?? "使用GOOGLE登陆"}
             </Link>
           </Button>
-          <p>{"或者"}</p>
+          <p>{i18n?.auth_hint ?? "或者"}</p>
         </div>
         <form id="signup-form" className={style.form}>
           <Input

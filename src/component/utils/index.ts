@@ -8,3 +8,4 @@ export type {TInputState, IInputAction} from './hook/input';
 export {useFetch} from './hook/fetch';
 
 export type {JsonValue, SideSign, Signup} from './type';
+export {fecthMasonry} from './masonry';

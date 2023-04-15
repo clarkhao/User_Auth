@@ -1,0 +1,32 @@
+.masonry-layout {
+  --columns: 1;
+  --gap: 0rem;
+  box-sizing: border-box;
+  display: grid;
+  grid-template-columns: repeat(var(--columns), 0fr);
+  grid-gap: var(--gap);
+  padding: 1rem;
+  flex: 1 0 auto;
+}
+.masonry-layout > div > .sub {
+  width: 100%;
+  margin-bottom: 5px;
+}
+.masonry-layout.columns-1 {
+  --columns: 1;
+}
+.masonry-layout.columns-2 {
+  --columns: 2;
+}
+.masonry-layout.columns-3 {
+  --columns: 3;
+}
+.masonry-layout.columns-4 {
+  --columns: 4;
+}
+.masonry-layout.columns-5 {
+  --columns: 5;
+}
+.masonry-layout.columns-6 {
+  --columns: 6;
+}

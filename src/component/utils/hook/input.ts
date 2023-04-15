@@ -50,7 +50,6 @@ function useInput(errMsg?: string) {
         };
       default:
         return state;
-        break;
     }
   };
   const initInputState: TInputState = {

@@ -1,0 +1,8 @@
+.container {
+  width: var(--avatar-icon-size);
+  height: var(--avatar-icon-size);
+  background-image: var(--avatar-icon-image);
+  border-radius: 50%;
+  position: relative;
+  cursor: pointer;
+}

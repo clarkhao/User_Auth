@@ -10,8 +10,6 @@ import { css } from "@emotion/react";
 import SignupLeft from "src/component/composite/auth/SignupLeft";
 import SignupRight from "src/component/composite/auth/SignupRight";
 import LeftRight from "src/component/layout/LeftRight";
-import { useRouter } from "next/router";
-import ThemeI18n from "src/component/composite/ThemeI18n";
 //type
 import type { SideSign, Signup } from "src/component/utils";
 
@@ -28,7 +26,6 @@ const SignupPage: NextPage<SignupProps> = (props) => {
         --signup-page-bg: ${theme.palette.background.default};
       `}
     >
-      <ThemeI18n size="60px" />
       <LeftRight
         left={<SignupLeft i18n={props.i18n.left} />}
         right={<SignupRight i18n={props.i18n.right} />}

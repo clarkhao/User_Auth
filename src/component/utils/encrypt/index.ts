@@ -82,7 +82,7 @@ const hybridEncrypt = async (data: unknown) => {
     const encryptor = new JSEncrypt();
     //env publickey saved in base64 string, first from base64 to string
     const savedKey = process.env.NEXT_PUBLIC_SECRET_KEY as string;
-    const publicKey = atob(savedKey);
+    const publicKey = window.atob(savedKey);
     encryptor.setPublicKey(publicKey);
     const encryptedKey = encryptor.encrypt(keyString.concat(`:${ivString}`));
     if (!encryptedKey) throw new Error("asymmetric encrypte failed");
